@@ -151,7 +151,7 @@ pub fn account_import_cmd<S: Storage>(
     Ok(())
 }
 
-pub fn account_list_cmd<S: Storage>(storage: &mut S) -> Result<(), Box<dyn std::error::Error>> {
+pub fn account_list_cmd<S: Storage>(storage: &S) -> Result<(), Box<dyn std::error::Error>> {
     let mut accounts = storage.list("accounts/")?;
     accounts.sort();
     for account in accounts {
@@ -165,7 +165,7 @@ pub fn account_list_cmd<S: Storage>(storage: &mut S) -> Result<(), Box<dyn std::
 
 pub fn account_show_cmd<S: Storage>(
     matches: &clap::ArgMatches,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let name = matches.value_of("name").unwrap();
     let storage_key = "accounts/".to_string() + name;
@@ -178,7 +178,7 @@ pub fn account_show_cmd<S: Storage>(
 
 pub fn account_sign_cmd<S: Storage>(
     matches: &clap::ArgMatches,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let name = matches.value_of("name").unwrap();
     let storage_key = "accounts/".to_string() + name;
@@ -213,7 +213,7 @@ pub fn account_sign_cmd<S: Storage>(
 
 pub fn account_verify_cmd<S: Storage>(
     matches: &clap::ArgMatches,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let name = matches.value_of("name").unwrap();
     let storage_key = "accounts/".to_string() + name;
@@ -266,7 +266,7 @@ pub fn account_verify_cmd<S: Storage>(
 
 pub fn account_info_cmd<S: Storage>(
     matches: &clap::ArgMatches,
-    storage: &mut S,
+    storage: &S,
     endpoint: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let name = matches.value_of("name").unwrap();
@@ -319,7 +319,7 @@ pub fn account_info_cmd<S: Storage>(
 
 pub fn account_send_cmd<S: Storage>(
     matches: &clap::ArgMatches,
-    storage: &mut S,
+    storage: &S,
     endpoint: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let from = matches.value_of("from").unwrap();
@@ -363,7 +363,14 @@ pub fn account_send_cmd<S: Storage>(
         }
     };
 
-    println!("[+] Transaction got included. Hash: {:?}\n", tx_hash);
+    log::info!("[+] Transaction got included. Hash: {:?}\n", tx_hash);
+    Ok(())
+}
+
+pub fn account_remove_cmd<S:Storage>(matches: &clap::ArgMatches, storage: &mut S) -> Result<(), Box<dyn std::error::Error>> {
+    let name = matches.value_of("name").unwrap();
+    let storage_key = "accounts/".to_string() + name;
+    storage.remove(&storage_key)?;
     Ok(())
 }
 
@@ -381,7 +388,7 @@ fn parse_passphrase<P: sp_core::Pair>(
 
 fn get_account_info<S: Storage>(
     account_name: &str,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<AccountInfo, Box<dyn std::error::Error>> {
     let storage_key = "accounts/".to_string() + account_name;
     let data = storage.get(&storage_key)?;
@@ -391,7 +398,7 @@ fn get_account_info<S: Storage>(
 
 fn get_account_id<S: Storage>(
     account_name: &str,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<AccountId32, Box<dyn std::error::Error>> {
     let account_info = get_account_info(account_name, storage)?;
     let id: AccountId32 = match <AccountId32>::from_ss58check(&account_info.address) {

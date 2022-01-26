@@ -27,7 +27,7 @@ pub fn credential_save_cmd<S: Storage>(
 
 pub fn credential_show_cmd<S: Storage>(
     sub_sub_matches: &ArgMatches,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let name = sub_sub_matches.value_of("name").unwrap();
     let key = "credentials/".to_string() + name;
@@ -38,7 +38,7 @@ pub fn credential_show_cmd<S: Storage>(
 
 pub fn credential_list_cmd<S: Storage>(
     sub_sub_matches: &ArgMatches,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let prefix = sub_sub_matches.value_of("prefix");
     let credentials = storage.list("credentials/")?;

@@ -16,6 +16,8 @@ mod credentials;
 use credentials::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    pretty_env_logger::init();
+
     let matches = App::new("kiltctl")
         .about("kilt command line client")
         .arg(arg!(-s --storage <STORAGE> "Path to the storage root directory")
@@ -26,6 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .default_value("wss://spiritnet.kilt.io")
             .required(false),
         )
+        .arg(arg!(--gpg <GPG_ID> "gpg id to use when encrypting/decrypting").required(false))
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(
             App::new("seed")
@@ -51,6 +54,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     App::new("show")
                         .arg(arg!(<NAME> "Name of the seed").name("name"))
                         .about("show seed")
+                )
+                .subcommand(
+                    App::new("delete")
+                        .alias("rm").alias("remove")
+                        .arg(arg!(<NAME> "Name of the seed").name("name"))
+                        .about("remove seed")
                 )
         )
         .subcommand(
@@ -101,7 +110,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .arg(arg!(--amount <AMOUNT> "amount"))
                     .about("get on-chain info about the account")
                 )
-
+                .subcommand(App::new("delete")
+                    .alias("rm").alias("remove")
+                    .arg(arg!(<NAME> "Name of the account").name("name"))
+                    .about("delete account")
+                )
         )
         .subcommand(App::new("chain")
             .about("chain handling")
@@ -136,9 +149,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .get_matches();
 
     let storage_root = shellexpand::tilde(matches.value_of("storage").unwrap());
-    let gpg_storage = GpgStorage::new(&storage_root);
+    let gpg_id = matches.value_of("gpg");
+    let gpg_storage = GpgStorage::new(&storage_root, gpg_id);
     let mut storage = GitStorage::new(gpg_storage, &storage_root);
-    
+
     let url = matches.value_of("endpoint").unwrap();
 
     match matches.subcommand() {
@@ -147,13 +161,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 seed_generate_cmd(sub_sub_matches, &mut storage)?;
             }
             Some(("list", _sub_sub_matches)) => {
-                seed_list_cmd(&mut storage)?;
+                seed_list_cmd(&storage)?;
             }
             Some(("import", sub_sub_matches)) => {
                 seed_import_cmd(sub_sub_matches, &mut storage)?;
             }
             Some(("show", sub_sub_matches)) => {
-                seed_show_cmd(sub_sub_matches, &mut storage)?;
+                seed_show_cmd(sub_sub_matches, &storage)?;
+            }
+            Some(("delete", sub_sub_matches)) => {
+                seed_remove_cmd(sub_sub_matches, &mut storage)?;
             }
             _ => unreachable!(),
         },
@@ -162,25 +179,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 account_generate_cmd(sub_sub_matches, &mut storage)?;
             }
             Some(("list", _sub_sub_matches)) => {
-                account_list_cmd(&mut storage)?;
+                account_list_cmd(&storage)?;
             }
             Some(("show", sub_sub_matches)) => {
-                account_show_cmd(sub_sub_matches, &mut storage)?;
+                account_show_cmd(sub_sub_matches, &storage)?;
             }
             Some(("import", sub_sub_matches)) => {
                 account_import_cmd(sub_sub_matches, &mut storage)?;
             }
             Some(("sign", sub_sub_matches)) => {
-                account_sign_cmd(sub_sub_matches, &mut storage)?;
+                account_sign_cmd(sub_sub_matches, &storage)?;
             }
             Some(("verify", sub_sub_matches)) => {
-                account_verify_cmd(sub_sub_matches, &mut storage)?;
+                account_verify_cmd(sub_sub_matches, &storage)?;
             }
             Some(("info", sub_sub_matches)) => {
-                account_info_cmd(sub_sub_matches, &mut storage, url)?;
+                account_info_cmd(sub_sub_matches, &storage, url)?;
             }
             Some(("send", sub_sub_matches)) => {
-                account_send_cmd(sub_sub_matches, &mut storage, url)?;
+                account_send_cmd(sub_sub_matches, &storage, url)?;
+            }
+            Some(("delete", sub_sub_matches)) => {
+                account_remove_cmd(sub_sub_matches, &mut storage)?;
             }
 
             _ => unreachable!(),
@@ -200,10 +220,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 credential_save_cmd(sub_sub_matches, &mut storage)?;
             }
             Some(("list", sub_sub_matches)) => {
-                credential_list_cmd(sub_sub_matches, &mut storage)?;
+                credential_list_cmd(sub_sub_matches, &storage)?;
             }
             Some(("show", sub_sub_matches)) => {
-                credential_show_cmd(sub_sub_matches, &mut storage)?;
+                credential_show_cmd(sub_sub_matches, &storage)?;
             }
             Some(("delete", sub_sub_matches)) => {
                 credential_delete_cmd(sub_sub_matches, &mut storage)?;

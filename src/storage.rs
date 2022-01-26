@@ -10,7 +10,8 @@ pub trait Storage {
 
 #[derive(Debug, Clone)]
 pub struct GpgStorage {
-    pub base_path: String,
+    base_path: String,
+    gpg_id: Option<String>,
 }
 
 impl Storage for GpgStorage {
@@ -20,6 +21,11 @@ impl Storage for GpgStorage {
         cmd.arg("--output");
         cmd.arg("-");
         cmd.arg("--default-recipient-self");
+        if let Some(gpg_id) = &self.gpg_id {
+            log::debug!("using gpg id: {}", gpg_id);
+            cmd.arg("--recipient");
+            cmd.arg(gpg_id);
+        }
         cmd.arg(self.base_path.to_owned() + "/" + key + ".gpg");
         let output = cmd.output()?;
         if output.status.success() {
@@ -37,6 +43,11 @@ impl Storage for GpgStorage {
         cmd.arg("--output");
         cmd.arg(self.base_path.to_owned() + "/" + key + ".gpg");
         cmd.arg("--default-recipient-self");
+        if let Some(gpg_id) = &self.gpg_id {
+            log::debug!("using gpg id: {}", gpg_id);
+            cmd.arg("--recipient");
+            cmd.arg(gpg_id);
+        }
         cmd.arg("-");
         cmd.stdin(std::process::Stdio::piped());
         let mut child = cmd.spawn()?;
@@ -75,9 +86,10 @@ impl Storage for GpgStorage {
 }
 
 impl GpgStorage {
-    pub fn new(base_path: &str) -> GpgStorage {
+    pub fn new(base_path: &str, gpg_id: Option<&str>) -> GpgStorage {
         GpgStorage {
             base_path: base_path.to_string(),
+            gpg_id: gpg_id.map(|s| s.to_string()),
         }
     }
 
@@ -120,7 +132,7 @@ mod test {
         use super::{GpgStorage, Storage};
 
         let dir = tempfile::tempdir().unwrap();
-        let mut storage = GpgStorage::new(dir.path().to_str().unwrap());
+        let mut storage = GpgStorage::new(dir.path().to_str().unwrap(), None);
         let key = "foo/bar/test_key";
         let value = "test_value";
         storage.set(key, value).unwrap();
@@ -141,16 +153,20 @@ impl<S: Storage> GitStorage<S> {
     pub fn new(storage: S, base_path: &str) -> GitStorage<S> {
         // check if git is initialized
         let mut cmd = Command::new("git");
+        cmd.current_dir(base_path.to_owned());
         cmd.arg("status");
         let output = cmd.output().unwrap();
         if !output.status.success() {
             // git is not initialized, initialize it
+            log::debug!("Initializing git repository");
             let mut cmd = Command::new("git");
-            cmd.current_dir(base_path);
+            cmd.current_dir(base_path.to_owned());
             cmd.arg("init");
             cmd.arg("-b");
             cmd.arg("main");
             cmd.output().unwrap();
+        }else{
+            log::debug!("Git repository already initialized");
         }
         GitStorage {
             storage,
@@ -159,10 +175,16 @@ impl<S: Storage> GitStorage<S> {
     }
 
     fn commit(&mut self, msg: &str) -> Result<(), Error> {
+        log::debug!("Committing changes");
+        let mut cmd = Command::new("git");
+        cmd.current_dir(self.base_path.to_owned());
+        cmd.arg("add");
+        cmd.arg(".");
+        cmd.output()?;
+
         let mut cmd = Command::new("git");
         cmd.current_dir(self.base_path.to_owned());
         cmd.arg("commit");
-        cmd.arg("-a");
         cmd.arg("-m");
         cmd.arg(msg);
         cmd.output()?;

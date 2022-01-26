@@ -30,7 +30,7 @@ pub fn seed_import_cmd<S: Storage>(
 
 pub fn seed_show_cmd<S: Storage>(
     matches: &clap::ArgMatches,
-    storage: &mut S,
+    storage: &S,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let name = matches.value_of("name").unwrap();
     let storage_key = "seeds/".to_string() + name;
@@ -39,11 +39,21 @@ pub fn seed_show_cmd<S: Storage>(
     Ok(())
 }
 
-pub fn seed_list_cmd<S: Storage>(storage: &mut S) -> Result<(), Box<dyn std::error::Error>> {
+pub fn seed_list_cmd<S: Storage>(storage: &S) -> Result<(), Box<dyn std::error::Error>> {
     let seeds = storage.list("seeds/")?;
     for name in seeds {
         println!("{}", name);
     }
+    Ok(())
+}
+
+pub fn seed_remove_cmd<S: Storage>(
+    matches: &clap::ArgMatches,
+    storage: &mut S,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let name = matches.value_of("name").unwrap();
+    let storage_key = "seeds/".to_string() + name;
+    storage.remove(&storage_key)?;
     Ok(())
 }
 
