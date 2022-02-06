@@ -136,5 +136,24 @@ cat doc.txt | kiltctl account sign sporran > doc.sig
 
 # verify the signature
 cat doc.txt | kiltctl account verify sporran --signature "$(cat doc.sig)" && echo "success!"
-
 ```
+
+### Import an address without seed
+
+Sometimes you might want to have some common addresses in your keystore to easily access them when sending tokens or verifying docs.
+You dont have to own the seeds to the accounts to just send them token or verify docs.
+
+```bash
+# import an account and save it as "friends/alice"
+kiltctl account import \
+    --algorithm sr25519 \
+    --address 4tPhwr6aBrn48nk5CsAWtAcoCMzT4UdtXGDbcQ8M7HDAw8Ee \
+    friends/alice
+
+# use the imported account to do stuff
+kiltctl account send --from sporran --to friends/alice --amount 1000.00
+```
+
+## Disclaimer
+
+This software comes as it is without any warranties. Look at the license for more infos. Although I'm employee of botlabs this here is my personal work and can not and will never be considered officially supported by the kilt team. If you want to use officially supported software to interact with the kilt blockchain consider using the [sdk](https://github.com/KILTprotocol/sdk-js). 
