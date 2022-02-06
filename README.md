@@ -82,4 +82,59 @@ But this also comes with a benefit: Since gpg is quiet old, there is a ton of to
 * you can generate a [paperkey](https://wiki.archlinux.org/title/Paperkey) for your gpg key
 * you can use your [yubikey](https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP) to have a two factor authentication on your gpg key
 * there is even limited [ledger support](https://support.ledger.com/hc/en-us/articles/115005200649-OpenPGP?docs=true) for your gpg key
-    
+
+## Recipes
+
+### Create paper wallet
+
+This will walk you through the process of creating a paperwallet. This will **not** save your seed or account infos into your local keystore.
+
+```bash
+# create a new seed and save it to a file
+kiltctl seed generate > seed.txt
+
+# create a account and save it to another file
+kiltctl account generate --seed "$(cat seed.txt)" > account.txt
+
+# create a QR code for printing
+cat seed.txt account.txt | qrencode -o paperwallet.png
+
+# print to paper and delete everything afterwards
+convert paperwallet.png paperwallet.pdf
+lp paperwallet.pdf
+rm paperwallet.* seed.txt
+
+# show account address so, you can send token to your paperwallet
+cat account.txt
+```
+
+### Import your sporran account
+
+```bash
+# create a text file with your passphrase
+echo "this is my twelve word passphrase which is obviously different than this" > sporran-seed.txt
+
+# import the seed and save it as "sporran"
+kiltctl seed import --path sporran-seed.txt sporran
+rm sporran-seed.txt
+
+# generate the default account from that seed and save it as "sporran"
+kiltctl account generate --seed @sporran sporran
+
+# now you can use your wallet from the command line
+kiltctl account send --from sporran --to savings --amount 1000.00
+```
+
+### Sign and verify documents
+
+```bash
+# prepare your doc
+echo "foobar" >> doc.txt
+
+# create signature
+cat doc.txt | kiltctl account sign sporran > doc.sig
+
+# verify the signature
+cat doc.txt | kiltctl account verify sporran --signature "$(cat doc.sig)" && echo "success!"
+
+```
