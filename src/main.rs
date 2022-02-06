@@ -149,6 +149,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .get_matches();
 
     let storage_root = shellexpand::tilde(matches.value_of("storage").unwrap());
+
+    ensure_dir(&storage_root)?;
+
     let gpg_id = matches.value_of("gpg");
     let gpg_storage = GpgStorage::new(&storage_root, gpg_id);
     let mut storage = GitStorage::new(gpg_storage, &storage_root);
@@ -233,5 +236,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => unreachable!(),
     };
 
+    Ok(())
+}
+
+fn ensure_dir(path: &str) -> Result<(), std::io::Error> {
+    let path = std::path::Path::new(path);
+    std::fs::create_dir_all(path)?;
     Ok(())
 }
