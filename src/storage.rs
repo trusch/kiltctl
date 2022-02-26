@@ -165,7 +165,7 @@ impl<S: Storage> GitStorage<S> {
             cmd.arg("-b");
             cmd.arg("main");
             cmd.output().unwrap();
-        }else{
+        } else {
             log::debug!("Git repository already initialized");
         }
         GitStorage {

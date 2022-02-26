@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
-use sp_core::crypto::{Ss58AddressFormat, Ss58Codec};
-use sp_core::{Decode, Encode};
-use sp_runtime::app_crypto::RuntimePublic;
-use sp_runtime::{AccountId32, MultiAddress};
 use std::io::Read;
-use substrate_api_client::rpc::WsRpcClient;
-use substrate_api_client::{AccountData, AccountInfoGen, Api, XtStatus};
+use subxt::{
+    sp_core::{
+        crypto::{Pair, Ss58AddressFormat, Ss58Codec},
+        Decode, Encode,
+    },
+    sp_runtime::{app_crypto::RuntimePublic, AccountId32, MultiAddress},
+};
 
 use crate::storage::Storage;
 
@@ -75,12 +76,14 @@ pub fn account_generate_cmd<S: Storage>(
     }
     let account = match matches.value_of("algorithm").unwrap().into() {
         SignatureAlgorithm::Ed25519 => {
-            parse_passphrase::<sp_core::ed25519::Pair>(&seed, password)?.0
+            parse_passphrase::<subxt::sp_core::ed25519::Pair>(&seed, password)?.0
         }
         SignatureAlgorithm::Sr25519 => {
-            parse_passphrase::<sp_core::sr25519::Pair>(&seed, password)?.0
+            parse_passphrase::<subxt::sp_core::sr25519::Pair>(&seed, password)?.0
         }
-        SignatureAlgorithm::Ecdsa => parse_passphrase::<sp_core::ecdsa::Pair>(&seed, password)?.0,
+        SignatureAlgorithm::Ecdsa => {
+            parse_passphrase::<subxt::sp_core::ecdsa::Pair>(&seed, password)?.0
+        }
     };
     if let Some(name) = matches.value_of("name") {
         let storage_key = "accounts/".to_string() + name;
@@ -115,8 +118,12 @@ pub fn account_generate_with_suffix_cmd<S: Storage>(
 
     let alg: SignatureAlgorithm = matches.value_of("algorithm").unwrap().into();
     let generator = AccountGenerator::new(&seed, alg);
-    let (account, idx) = generator.filter(|e|e.0.ends_with(suffix)).take(1).collect::<Vec<_>>()[0].clone();
-    
+    let (account, idx) = generator
+        .filter(|e| e.0.ends_with(suffix))
+        .take(1)
+        .collect::<Vec<_>>()[0]
+        .clone();
+
     if let Some(name) = matches.value_of("name") {
         let storage_key = "accounts/".to_string() + name;
         let algo = matches.value_of("algorithm").unwrap().into();
@@ -131,7 +138,7 @@ pub fn account_generate_with_suffix_cmd<S: Storage>(
         let bs = serde_json::to_string(&data)?;
         storage.set(&storage_key, &bs)?;
     }
-    
+
     println!("{}", account);
     println!("//{}", idx);
     Ok(())
@@ -185,7 +192,6 @@ pub fn account_sign_cmd<S: Storage>(
     let data = storage.get(&storage_key)?;
     let account_info: AccountInfo = serde_json::from_str(&data)?;
     if let Some(seed_id) = account_info.seed_id {
-        use sp_core::Pair;
         let mut message = String::new();
         std::io::stdin().read_to_string(&mut message)?;
         // let message = hex::decode(message.trim()).unwrap();
@@ -193,15 +199,15 @@ pub fn account_sign_cmd<S: Storage>(
         let seed = storage.get(&storage_key)?;
         let signature = match account_info.algorithm {
             SignatureAlgorithm::Ed25519 => {
-                let pair = parse_passphrase::<sp_core::ed25519::Pair>(&seed, None)?.1;
+                let pair = parse_passphrase::<subxt::sp_core::ed25519::Pair>(&seed, None)?.1;
                 pair.sign(message.as_bytes()).encode()
             }
             SignatureAlgorithm::Sr25519 => {
-                let pair = parse_passphrase::<sp_core::sr25519::Pair>(&seed, None)?.1;
+                let pair = parse_passphrase::<subxt::sp_core::sr25519::Pair>(&seed, None)?.1;
                 pair.sign(message.as_bytes()).encode()
             }
             SignatureAlgorithm::Ecdsa => {
-                let pair = parse_passphrase::<sp_core::ecdsa::Pair>(&seed, None)?.1;
+                let pair = parse_passphrase::<subxt::sp_core::ecdsa::Pair>(&seed, None)?.1;
                 pair.sign(message.as_bytes()).encode()
             }
         };
@@ -229,28 +235,34 @@ pub fn account_verify_cmd<S: Storage>(
 
     let public = match account_info.algorithm {
         SignatureAlgorithm::Ed25519 => {
-            match <sp_core::ed25519::Public>::from_ss58check_with_version(&account_info.address) {
+            match <subxt::sp_core::ed25519::Public>::from_ss58check_with_version(
+                &account_info.address,
+            ) {
                 Ok(p) => p.0.verify(
                     &message,
-                    &<sp_core::ed25519::Signature>::decode(&mut &bytes[..])?,
+                    &<subxt::sp_core::ed25519::Signature>::decode(&mut &bytes[..])?,
                 ),
                 Err(_) => return Err("Invalid address".into()),
             }
         }
         SignatureAlgorithm::Sr25519 => {
-            match <sp_core::sr25519::Public>::from_ss58check_with_version(&account_info.address) {
+            match <subxt::sp_core::sr25519::Public>::from_ss58check_with_version(
+                &account_info.address,
+            ) {
                 Ok(p) => p.0.verify(
                     &message,
-                    &<sp_core::sr25519::Signature>::decode(&mut &bytes[..])?,
+                    &<subxt::sp_core::sr25519::Signature>::decode(&mut &bytes[..])?,
                 ),
                 Err(_) => return Err("Invalid address".into()),
             }
         }
         SignatureAlgorithm::Ecdsa => {
-            match <sp_core::ecdsa::Public>::from_ss58check_with_version(&account_info.address) {
+            match <subxt::sp_core::ecdsa::Public>::from_ss58check_with_version(
+                &account_info.address,
+            ) {
                 Ok(p) => p.0.verify(
                     &message,
-                    &<sp_core::ecdsa::Signature>::decode(&mut &bytes[..])?,
+                    &<subxt::sp_core::ecdsa::Signature>::decode(&mut &bytes[..])?,
                 ),
                 Err(_) => return Err("Invalid address".into()),
             }
@@ -264,7 +276,7 @@ pub fn account_verify_cmd<S: Storage>(
     Ok(())
 }
 
-pub fn account_info_cmd<S: Storage>(
+pub async fn account_info_cmd<S: Storage>(
     matches: &clap::ArgMatches,
     storage: &S,
     endpoint: &str,
@@ -273,36 +285,15 @@ pub fn account_info_cmd<S: Storage>(
     let storage_key = "accounts/".to_string() + name;
     let data = storage.get(&storage_key)?;
     let account_info: AccountInfo = serde_json::from_str(&data)?;
-
-    let client = WsRpcClient::new(endpoint);
-    fn get_account<Pair: sp_core::Pair, Public: sp_core::Public + sp_core::Encode>(
-        client: WsRpcClient,
-        addr: &str,
-    ) -> Result<AccountInfoGen<u64, AccountData>, Box<dyn std::error::Error>> {
-        let api = Api::<Pair, _>::new(client)?;
-        let public = match <Public>::from_ss58check(addr) {
-            Ok(p) => p,
-            Err(_) => return Err("Invalid address".into()),
-        };
-        let result: AccountInfoGen<u64, AccountData> = api
-            .get_storage_map("System", "Account", public, None)?
-            .ok_or::<Box<dyn std::error::Error>>("failed to find account".into())?;
-        Ok(result)
-    }
-    let result: AccountInfoGen<u64, AccountData> = match account_info.algorithm {
-        SignatureAlgorithm::Ed25519 => get_account::<
-            sp_core::ed25519::Pair,
-            sp_core::ed25519::Public,
-        >(client, &account_info.address)?,
-        SignatureAlgorithm::Sr25519 => get_account::<
-            sp_core::sr25519::Pair,
-            sp_core::sr25519::Public,
-        >(client, &account_info.address)?,
-        SignatureAlgorithm::Ecdsa => get_account::<sp_core::ecdsa::Pair, sp_core::ecdsa::Public>(
-            client,
-            &account_info.address,
-        )?,
-    };
+    let api = crate::kilt::connect(endpoint).await?;
+    let result = api
+        .storage()
+        .system()
+        .account(
+            subxt::sp_runtime::AccountId32::from_ss58check(&account_info.address)?,
+            None,
+        )
+        .await?;
 
     let free = result.data.free as f64 / 1_000_000_000_000_000_f64;
     let reserved = result.data.reserved as f64 / 1_000_000_000_000_000_f64;
@@ -317,7 +308,7 @@ pub fn account_info_cmd<S: Storage>(
     Ok(())
 }
 
-pub fn account_send_cmd<S: Storage>(
+pub async fn account_send_cmd<S: Storage>(
     matches: &clap::ArgMatches,
     storage: &S,
     endpoint: &str,
@@ -332,49 +323,111 @@ pub fn account_send_cmd<S: Storage>(
 
     let from_info = get_account_info(from, storage)?;
     let receiver = get_account_id(&to, storage)?;
-    let client = WsRpcClient::new(endpoint);
-    let tx_hash = match from_info.algorithm {
+    let api = crate::kilt::connect(endpoint).await?;
+    let tx = api.tx().balances().transfer(
+        MultiAddress::Id(receiver),
+        (amount * 1_000_000_000_000_000_f64) as u128,
+    );
+    let res = match from_info.algorithm {
         SignatureAlgorithm::Sr25519 => {
-            let signer: sp_core::sr25519::Pair = get_signer(&from, None, storage)?;
-            let api = Api::new(client)?.set_signer(signer);
-            let xt = api.balance_transfer(
-                MultiAddress::Id(receiver),
-                (amount * 1_000_000_000_000_000_f64) as u128,
-            );
-            api.send_extrinsic(xt.hex_encode(), XtStatus::InBlock)?
+            let signer: subxt::sp_core::sr25519::Pair = get_signer(&from, None, storage)?;
+            let s = subxt::PairSigner::new(signer);
+            tx.sign_and_submit_then_watch(&s)
+                .await?
+                .wait_for_in_block()
+                .await?
         }
         SignatureAlgorithm::Ed25519 => {
-            let signer: sp_core::ed25519::Pair = get_signer(&from, None, storage)?;
-            let api = Api::new(client)?.set_signer(signer);
-            let xt = api.balance_transfer(
-                MultiAddress::Id(receiver),
-                (amount * 1_000_000_000_000_000_f64) as u128,
-            );
-            api.send_extrinsic(xt.hex_encode(), XtStatus::InBlock)?
+            let signer: subxt::sp_core::ed25519::Pair = get_signer(&from, None, storage)?;
+            let s = subxt::PairSigner::new(signer);
+            tx.sign_and_submit_then_watch(&s)
+                .await?
+                .wait_for_in_block()
+                .await?
         }
         SignatureAlgorithm::Ecdsa => {
-            let signer: sp_core::ecdsa::Pair = get_signer(&from, None, storage)?;
-            let api = Api::new(client)?.set_signer(signer);
-            let xt = api.balance_transfer(
-                MultiAddress::Id(receiver),
-                (amount * 1_000_000_000_000_000_f64) as u128,
-            );
-            api.send_extrinsic(xt.hex_encode(), XtStatus::InBlock)?
+            let signer: subxt::sp_core::ecdsa::Pair = get_signer(&from, None, storage)?;
+            let s = subxt::PairSigner::new(signer);
+            tx.sign_and_submit_then_watch(&s)
+                .await?
+                .wait_for_in_block()
+                .await?
         }
     };
 
-    log::info!("[+] Transaction got included. Hash: {:?}\n", tx_hash);
+    log::info!(
+        "[+] Transaction got included. Block: {:?} Extrinsic: {:?}\n",
+        res.block_hash(),
+        res.extrinsic_hash()
+    );
     Ok(())
 }
 
-pub fn account_remove_cmd<S:Storage>(matches: &clap::ArgMatches, storage: &mut S) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn account_send_all_cmd<S: Storage>(
+    matches: &clap::ArgMatches,
+    storage: &S,
+    endpoint: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let from = matches.value_of("from").unwrap();
+    let to = matches.value_of("to").unwrap();
+    let keep_alive = matches.is_present("keep-alive");
+
+    println!("from: {}", from);
+    println!("to: {}", to);
+
+    let from_info = get_account_info(from, storage)?;
+    let receiver = get_account_id(&to, storage)?;
+    let api = crate::kilt::connect(endpoint).await?;
+    let tx = api
+        .tx()
+        .balances()
+        .transfer_all(MultiAddress::Id(receiver), keep_alive);
+    let res = match from_info.algorithm {
+        SignatureAlgorithm::Sr25519 => {
+            let signer: subxt::sp_core::sr25519::Pair = get_signer(&from, None, storage)?;
+            let s = subxt::PairSigner::new(signer);
+            tx.sign_and_submit_then_watch(&s)
+                .await?
+                .wait_for_in_block()
+                .await?
+        }
+        SignatureAlgorithm::Ed25519 => {
+            let signer: subxt::sp_core::ed25519::Pair = get_signer(&from, None, storage)?;
+            let s = subxt::PairSigner::new(signer);
+            tx.sign_and_submit_then_watch(&s)
+                .await?
+                .wait_for_in_block()
+                .await?
+        }
+        SignatureAlgorithm::Ecdsa => {
+            let signer: subxt::sp_core::ecdsa::Pair = get_signer(&from, None, storage)?;
+            let s = subxt::PairSigner::new(signer);
+            tx.sign_and_submit_then_watch(&s)
+                .await?
+                .wait_for_in_block()
+                .await?
+        }
+    };
+
+    log::info!(
+        "[+] Transaction got included. Block: {:?} Extrinsic: {:?}\n",
+        res.block_hash(),
+        res.extrinsic_hash()
+    );
+    Ok(())
+}
+
+pub fn account_remove_cmd<S: Storage>(
+    matches: &clap::ArgMatches,
+    storage: &mut S,
+) -> Result<(), Box<dyn std::error::Error>> {
     let name = matches.value_of("name").unwrap();
     let storage_key = "accounts/".to_string() + name;
     storage.remove(&storage_key)?;
     Ok(())
 }
 
-fn parse_passphrase<P: sp_core::Pair>(
+fn parse_passphrase<P: subxt::sp_core::Pair>(
     passphrase: &str,
     password: Option<&str>,
 ) -> Result<(String, P), String> {
@@ -401,14 +454,15 @@ fn get_account_id<S: Storage>(
     storage: &S,
 ) -> Result<AccountId32, Box<dyn std::error::Error>> {
     let account_info = get_account_info(account_name, storage)?;
-    let id: AccountId32 = match <AccountId32>::from_ss58check(&account_info.address) {
-        Ok(id) => id,
-        Err(_) => return Err("Invalid address".into()),
-    };
+    let id: AccountId32 =
+        match <subxt::sp_runtime::AccountId32>::from_ss58check(&account_info.address) {
+            Ok(id) => id,
+            Err(_) => return Err("Invalid address".into()),
+        };
     Ok(id)
 }
 
-fn get_signer<P: sp_core::Pair, S: Storage>(
+fn get_signer<P: subxt::sp_core::Pair, S: Storage>(
     account_name: &str,
     password: Option<&str>,
     storage: &S,
@@ -440,7 +494,11 @@ struct AccountGenerator {
 
 impl AccountGenerator {
     pub fn new(seed: &str, alg: SignatureAlgorithm) -> Self {
-        Self { seed: seed.to_string(), alg, idx: 0 }
+        Self {
+            seed: seed.to_string(),
+            alg,
+            idx: 0,
+        }
     }
 }
 
@@ -453,15 +511,33 @@ impl Iterator for AccountGenerator {
             println!("checked {} addresses...", self.idx);
         }
         match self.alg {
-            SignatureAlgorithm::Ed25519 => {
-                Some((parse_passphrase::<sp_core::ed25519::Pair>(&(self.seed.to_string()+"/"+&self.idx.to_string()), None).unwrap().0, self.idx))
-            }
-            SignatureAlgorithm::Sr25519 => {
-                Some((parse_passphrase::<sp_core::sr25519::Pair>(&(self.seed.to_string()+"/"+&self.idx.to_string()), None).unwrap().0, self.idx))
-            }
-            SignatureAlgorithm::Ecdsa => {
-                Some((parse_passphrase::<sp_core::ecdsa::Pair>(&(self.seed.to_string()+"/"+&self.idx.to_string()), None).unwrap().0, self.idx))
-            },
+            SignatureAlgorithm::Ed25519 => Some((
+                parse_passphrase::<subxt::sp_core::ed25519::Pair>(
+                    &(self.seed.to_string() + "/" + &self.idx.to_string()),
+                    None,
+                )
+                .unwrap()
+                .0,
+                self.idx,
+            )),
+            SignatureAlgorithm::Sr25519 => Some((
+                parse_passphrase::<subxt::sp_core::sr25519::Pair>(
+                    &(self.seed.to_string() + "/" + &self.idx.to_string()),
+                    None,
+                )
+                .unwrap()
+                .0,
+                self.idx,
+            )),
+            SignatureAlgorithm::Ecdsa => Some((
+                parse_passphrase::<subxt::sp_core::ecdsa::Pair>(
+                    &(self.seed.to_string() + "/" + &self.idx.to_string()),
+                    None,
+                )
+                .unwrap()
+                .0,
+                self.idx,
+            )),
         }
     }
 }

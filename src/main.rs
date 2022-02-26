@@ -15,7 +15,10 @@ use chain::*;
 mod credentials;
 use credentials::*;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+mod kilt;
+
+#[async_std::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     pretty_env_logger::init();
 
     let matches = App::new("kiltctl")
@@ -25,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .required(false),
         )
         .arg(arg!(-e --endpoint <ENDPOINT> "chain endpoint")
-            .default_value("wss://spiritnet.kilt.io")
+            .default_value("wss://spiritnet.kilt.io:443")
             .required(false),
         )
         .arg(arg!(--gpg <GPG_ID> "gpg id to use when encrypting/decrypting").required(false))
@@ -108,7 +111,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .arg(arg!(--from <FROM> "source account"))
                     .arg(arg!(--to <TO> "target account"))
                     .arg(arg!(--amount <AMOUNT> "amount"))
-                    .about("get on-chain info about the account")
+                    .about("send kilts from one account to another")
+                )
+                .subcommand(App::new("send_all")
+                    .arg(arg!(--from <FROM> "source account"))
+                    .arg(arg!(--to <TO> "target account"))
+                    .arg(arg!(--keep-alive "Keep the source account alive").required(false))
+                    .about("send all kilts from one account to another")
                 )
                 .subcommand(App::new("delete")
                     .alias("rm").alias("remove")
@@ -121,7 +130,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .setting(AppSettings::SubcommandRequiredElseHelp)
             .subcommand(App::new("metadata")
                 .about("get metadata")
-                .arg(arg!(--json "Print the metadata in JSON format"))
+                .arg(arg!(--json "Print the metadata in json format").required(false))
             )
             .subcommand(App::new("runtime-version")
                 .about("get runtime version")
@@ -197,10 +206,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 account_verify_cmd(sub_sub_matches, &storage)?;
             }
             Some(("info", sub_sub_matches)) => {
-                account_info_cmd(sub_sub_matches, &storage, url)?;
+                account_info_cmd(sub_sub_matches, &storage, url).await?;
             }
             Some(("send", sub_sub_matches)) => {
-                account_send_cmd(sub_sub_matches, &storage, url)?;
+                account_send_cmd(sub_sub_matches, &storage, url).await?;
+            }
+            Some(("send_all", sub_sub_matches)) => {
+                account_send_all_cmd(sub_sub_matches, &storage, url).await?;
             }
             Some(("delete", sub_sub_matches)) => {
                 account_remove_cmd(sub_sub_matches, &mut storage)?;
