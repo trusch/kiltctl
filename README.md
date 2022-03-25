@@ -158,7 +158,7 @@ kiltctl account send --from sporran --to friends/alice --amount 1000.00
 
 This shows how you create a completely fresh full did. The only requirement is that you have a funded `payment-account` in your wallet.
 
-```
+```bash
 # generate a new seed
 kiltctl seed generate did-seed
 
@@ -175,16 +175,41 @@ kiltctl did create --auth did-auth-account example-id
 kiltctl did register --payment payment-account example-id
 ```
 
+### Import your DID from sporran
+
+You can also import your sporran DID.
+
+```bash
+# create a text file with your passphrase
+echo "this is my twelve word passphrase which is obviously different than this" > sporran-seed.txt
+
+# import the seed and save it as "sporran"
+kiltctl seed import --path sporran-seed.txt sporran-seed
+rm sporran-seed.txt
+
+# generate the wallet account
+kiltctl account generate --seed @sporran-seed sporran-payment-account
+
+# generate the authentication key 
+kiltctl account generate \
+    --seed @sporran-seed \
+    --derive '//did//0' \
+    sporran-did-auth-account
+
+# write the DID to local storage and give it a name
+kiltctl did create --auth sporran-did-auth-account sporran-id
+```
+
 ### Claim a web3 name
 
 Claiming a web3 name is simple:
 
-```
-# claim the w3n `example` for `example-id` paying with `payment-account`
+```bash
+# claim the w3n `example` for `sporran-id` paying with `sporran-payment-account`
 kiltctl did claim-web3-name \
-    --did example-id \
+    --did sporran-id \
     --name example \
-    --payment payment-account
+    --payment sporran-payment-account
 ```
 
 ## Disclaimer
