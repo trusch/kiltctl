@@ -30,11 +30,11 @@ impl From<&str> for SignatureAlgorithm {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccountInfo {
-    name: String,
-    algorithm: SignatureAlgorithm,
-    seed_id: Option<String>,
-    derive_path: Option<String>,
-    address: String,
+    pub name: String,
+    pub algorithm: SignatureAlgorithm,
+    pub seed_id: Option<String>,
+    pub derive_path: Option<String>,
+    pub address: String,
 }
 
 impl AccountInfo {
@@ -294,6 +294,8 @@ pub async fn account_info_cmd<S: Storage>(
             None,
         )
         .await?;
+    
+    println!("{:?}", result);
 
     let free = result.data.free as f64 / 1_000_000_000_000_000_f64;
     let reserved = result.data.reserved as f64 / 1_000_000_000_000_000_f64;
@@ -462,7 +464,7 @@ fn get_account_id<S: Storage>(
     Ok(id)
 }
 
-fn get_signer<P: subxt::sp_core::Pair, S: Storage>(
+pub fn get_signer<P: subxt::sp_core::Pair, S: Storage>(
     account_name: &str,
     password: Option<&str>,
     storage: &S,

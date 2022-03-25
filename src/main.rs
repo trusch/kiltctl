@@ -1,6 +1,7 @@
 use clap::{arg, App, AppSettings};
 
 mod storage;
+use did::{did_claim_web3name, did_create_cmd, did_register_cmd, did_list_cmd, did_show_cmd};
 use storage::{GitStorage, GpgStorage};
 
 mod accounts;
@@ -17,10 +18,12 @@ use credentials::*;
 
 mod kilt;
 
+mod did;
+
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    pretty_env_logger::init();
-
+    pretty_env_logger::formatted_builder().filter(None, log::LevelFilter::Info).init();
+    
     let matches = App::new("kiltctl")
         .about("kilt command line client")
         .arg(arg!(-s --storage <STORAGE> "Path to the storage root directory")
@@ -155,6 +158,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .arg(arg!(<NAME> "Name of the credential").name("name"))
             )
         )
+        .subcommand(App::new("did")
+            .about("DID operations")
+            .setting(AppSettings::SubcommandRequiredElseHelp)
+            .subcommand(App::new("create")
+                .about("create a did")
+                .arg(arg!(<NAME> "Name of the DID").name("name"))
+                .arg(arg!(--auth <AUTH_ACCOUNT_NAME> "name of the initital auth account"))
+                .arg(arg!(--delegation <DELEGATION_ACCOUNT_NAME> "name of the delegation account").required(false))
+                .arg(arg!(--attestation <ATTESTATION_ACCOUNT_NAME> "name of the attestation account").required(false))
+                .arg(arg!(--key_agreement <KEY_AGREEMENT_ACCOUNT_NAME> "name of the key agreement account").required(false).multiple_occurrences(true))
+            )
+            .subcommand(App::new("list")
+                .about("list dids")
+            )
+            .subcommand(App::new("show")
+                .arg(arg!(<NAME> "Name of the did").name("name"))
+            )
+            .subcommand(App::new("register")
+                .arg(arg!(<NAME> "Name of the did").name("name"))
+                .arg(arg!(--payment <PAYMENT_ACCOUNT_NAME> "name of the payment account"))
+            )
+            .subcommand(App::new("claim-web3-name")
+                .about("claim a web3 name")
+                .arg(arg!(--did <DID_NAME> "name of the did"))
+                .arg(arg!(--payment <PAYMENT_ACCOUNT_NAME> "name of the payment account"))
+                .arg(arg!(--name <NAME> "name to claim"))
+            )    
+        )
         .get_matches();
 
     let storage_root = shellexpand::tilde(matches.value_of("storage").unwrap());
@@ -165,7 +196,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let gpg_storage = GpgStorage::new(&storage_root, gpg_id);
     let mut storage = GitStorage::new(gpg_storage, &storage_root);
 
-    let url = matches.value_of("endpoint").unwrap();
+    let mut endpoint: String;
+    if let Ok(res) = std::env::var("KILTCTL_ENDPOINT") {
+        endpoint = res.clone().into();
+    }else{
+        endpoint = matches.value_of("endpoint").unwrap().into();
+    }
+    endpoint = match endpoint.as_str() {
+        "spiritnet" => "wss://spiritnet.kilt.io:443".into(),
+        "peregrine" => "wss://peregrine.kilt.io:443/parachain-public-ws".into(),
+        _ => endpoint,
+    };
 
     match matches.subcommand() {
         Some(("seed", sub_matches)) => match sub_matches.subcommand() {
@@ -206,13 +247,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 account_verify_cmd(sub_sub_matches, &storage)?;
             }
             Some(("info", sub_sub_matches)) => {
-                account_info_cmd(sub_sub_matches, &storage, url).await?;
+                account_info_cmd(sub_sub_matches, &storage, &endpoint).await?;
             }
             Some(("send", sub_sub_matches)) => {
-                account_send_cmd(sub_sub_matches, &storage, url).await?;
+                account_send_cmd(sub_sub_matches, &storage, &endpoint).await?;
             }
             Some(("send_all", sub_sub_matches)) => {
-                account_send_all_cmd(sub_sub_matches, &storage, url).await?;
+                account_send_all_cmd(sub_sub_matches, &storage, &endpoint).await?;
             }
             Some(("delete", sub_sub_matches)) => {
                 account_remove_cmd(sub_sub_matches, &mut storage)?;
@@ -223,10 +264,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(("chain", sub_matches)) => match sub_matches.subcommand() {
             Some(("metadata", sub_sub_matches)) => {
                 let json = sub_sub_matches.is_present("json");
-                chain_metadata_cmd(url, json)?;
+                chain_metadata_cmd(&endpoint, json)?;
             }
             Some(("runtime-version", _sub_sub_matches)) => {
-                chain_runtime_version_cmd(url)?;
+                chain_runtime_version_cmd(&endpoint)?;
             }
             _ => unreachable!(),
         },
@@ -243,6 +284,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Some(("delete", sub_sub_matches)) => {
                 credential_delete_cmd(sub_sub_matches, &mut storage)?;
             }
+            _ => unreachable!(),
+        },
+        Some(("did", sub_matches)) => match sub_matches.subcommand() {
+            Some(("create", sub_sub_matches)) => {
+                did_create_cmd(sub_sub_matches, &mut storage)?;
+            },
+            Some(("list", _sub_sub_matches)) => {
+                did_list_cmd(&storage)?;
+            },
+            Some(("show", sub_sub_matches)) => {
+                did_show_cmd(sub_sub_matches, &storage)?;
+            },
+            Some(("register", sub_sub_matches)) => {
+                did_register_cmd(sub_sub_matches, &storage, &endpoint).await?;
+            },
+            Some(("claim-web3-name", sub_sub_matches)) => {
+                did_claim_web3name(sub_sub_matches, &mut storage, &endpoint).await?;
+            },
             _ => unreachable!(),
         },
         _ => unreachable!(),

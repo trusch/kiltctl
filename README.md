@@ -154,6 +154,39 @@ kiltctl account import \
 kiltctl account send --from sporran --to friends/alice --amount 1000.00
 ```
 
+### Create and register a full DID
+
+This shows how you create a completely fresh full did. The only requirement is that you have a funded `payment-account` in your wallet.
+
+```
+# generate a new seed
+kiltctl seed generate did-seed
+
+# generate the authentication key 
+kiltctl account generate \
+    --seed @did-seed \
+    --derive '//did//0' \
+    did-auth-account
+
+# write the DID to local storage and give it a name
+kiltctl did create --auth did-auth-account example-id
+
+# register the DID to the chain paying with the payment-account
+kiltctl did register --payment payment-account example-id
+```
+
+### Claim a web3 name
+
+Claiming a web3 name is simple:
+
+```
+# claim the w3n `example` for `example-id` paying with `payment-account`
+kiltctl did claim-web3-name \
+    --did example-id \
+    --name example \
+    --payment payment-account
+```
+
 ## Disclaimer
 
 This software comes as it is without any warranties. Look at the license for more infos. Although I'm employee of botlabs this here is my personal work and can not and will never be considered officially supported by the kilt team. If you want to use officially supported software to interact with the kilt blockchain consider using the [sdk](https://github.com/KILTprotocol/sdk-js). 
