@@ -6,7 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-codec = { package = "parity-scale-codec", features = ["derive"], version = "2.0.0" }
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+    "derive",
+    "full",
+    "bit-vec",
+] }
 subxt = { git = "https://github.com/paritytech/subxt.git", branch = "master" }
 async-std = { version = "1.9.0", features = ["attributes", "tokio1"] }
 tiny-bip39 = "0.8.2"
@@ -19,6 +23,16 @@ shellexpand = "2.1"
 walkdir = "2"
 log = "0.4"
 pretty_env_logger = "0.4"
+crypto_box = "*"
+rand_chacha = "*"
+blake2 = "*"
+rand = "*"
+rand_core = "*"
+base58 = "*"
+parking_lot = { version = "0.12", features = ["nightly"] }
+libsecp256k1 = { version = "0.7", features = [ "hmac" ] }
+sha3 = { version = "0.10.1", default-features = false }
+
 
 [dev-dependencies]
 tempfile = "3"

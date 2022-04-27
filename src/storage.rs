@@ -6,6 +6,17 @@ pub trait Storage {
     fn set(&mut self, key: &str, value: &str) -> Result<(), Error>;
     fn list(&self, prefix: &str) -> Result<Vec<String>, Error>;
     fn remove(&mut self, key: &str) -> Result<(), Error>;
+    
+    fn save<T: serde::Serialize>(&mut self, key: &str, val: T) -> Result<(), Error> {
+        let bs = serde_json::to_string(&val)?;
+        self.set(key, &bs)
+    }
+
+    fn load<T: serde::de::DeserializeOwned>(&self, key: &str) -> Result<T, Error> {
+        let data = self.get(key)?;
+        let res: T = serde_json::from_str(&data)?;
+        Ok(res)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -123,7 +134,50 @@ impl From<std::io::Error> for Error {
     }
 }
 
+impl From<serde_json::Error> for Error {
+    fn from(e: serde_json::Error) -> Self {
+        Error::IO(format!("failed to deserialize: {}", e.to_string()).to_string())
+    }
+}
+
 impl std::error::Error for Error {}
+
+pub struct MemoryStorage {
+    data: std::collections::HashMap<String, String>,
+}
+
+impl MemoryStorage {
+    pub fn new() -> MemoryStorage {
+        MemoryStorage {
+            data: std::collections::HashMap::new(),
+        }
+    }
+}
+
+impl Storage for MemoryStorage {
+    fn get(&self, key: &str) -> Result<String, Error> {
+        Ok(self.data.get(key).unwrap_or(&"".to_string()).to_string())
+    }
+
+    fn set(&mut self, key: &str, value: &str) -> Result<(), Error> {
+        self.data.insert(key.to_string(), value.to_string());
+        Ok(())
+    }
+
+    fn remove(&mut self, key: &str) -> Result<(), Error> {
+        self.data.remove(key);
+        Ok(())
+    }
+
+    fn list(&self, dir: &str) -> Result<Vec<String>, Error> {
+        Ok(self
+            .data
+            .keys()
+            .filter(|k| k.starts_with(dir))
+            .map(|k| k.to_string())
+            .collect())
+    }
+}
 
 mod test {
 

@@ -1,4 +1,4 @@
-use subxt::{ClientBuilder, Config, DefaultConfig, DefaultExtra};
+use subxt::{ClientBuilder, Config, DefaultConfig, PolkadotExtrinsicParams};
 
 // This generates the kilt runtime api for us
 #[subxt::subxt(runtime_metadata_path = "metadata.scale")]
@@ -58,11 +58,11 @@ impl Config for KiltConfig {
 /// connect to a websocket endpoint using the KiltConfig
 pub async fn connect<U: Into<String>>(
     url: U,
-) -> Result<kilt::RuntimeApi<KiltConfig, DefaultExtra<KiltConfig>>, subxt::BasicError> {
+) -> Result<kilt::RuntimeApi<KiltConfig, PolkadotExtrinsicParams<KiltConfig>>, subxt::BasicError> {
     let api = ClientBuilder::new()
         .set_url(url)
         .build()
         .await?
-        .to_runtime_api::<kilt::RuntimeApi<KiltConfig, DefaultExtra<KiltConfig>>>();
+        .to_runtime_api::<kilt::RuntimeApi<KiltConfig, PolkadotExtrinsicParams<KiltConfig>>>();
     Ok(api)
 }
