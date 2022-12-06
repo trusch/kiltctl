@@ -1,0 +1,12 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/trusch/Code/kiltctl'
+echo '{"jsonrpc":"2.0","id":"1","method":"state_getMetadata"}' | \
+	websocat -B 655350 wss://spiritnet.kilt.io:443 | \
+	jq -r .result | \
+	xxd -r -p \
+	> metadata.scale
+cargo build --release
+mkdir -p bin 
+cp target/release/kiltctl bin/kiltctl
+make: Leaving directory '/home/trusch/Code/kiltctl'
+ 

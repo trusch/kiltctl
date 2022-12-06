@@ -1,217 +1,39 @@
 # kiltctl
 
-`kiltctl` is a command line tool for managing accounts and interacting with the kilt blockchain.
+`kiltctl` is a tool to work with the KILT protocol. It supports building extrinsics and sending them to a node, retrieving storage items and creating and verifying credentials.
 
-## Features
+## Installation
 
-### Ready to use
+### From source
 
-* account management
-    * seed generation / import
-    * use any derive pathes to generate accounts
-    * import accounts
-    * support for sr25519, ed25519 and ecdsa signature algorithms
-* secure storage with cross-device synchronization
-    * all application data is stored in gpg encrypted files
-    * all application data is stored within a git repository
-* query account balances
-* send kilt token to other accounts
-* sign and verify stuff
-* securely store and retrieve credentials
-* query chain metadata
-* query chain runtime version
-
-### Planned, but not there yet
-
-* DID support
-* credential verification
-* create ctypes and write attestations to chain
-* setup delegations
-* manage staking
-* create claims
-
-## Walkthrough
+To install `kiltctl` from source, you need to have [Rust](https://www.rust-lang.org/tools/install) installed. Then, run the following command:
 
 ```bash
-# generate a new seed phrase
-$ kiltctl seed generate --words 12 seed-1
+# clone
+git clone https://github.com/trusch/kiltctl.git
+cd kiltctl
 
-# generate a new account from the seed phrase
-$ kiltctl account generate \
-    --algorithm sr25519 \
-    --derive '//kilt/accounts/sr25519/1' \
-    --seed @seed-1 \
-    account-1
-4s2nEFqAhstzrtwz71WzKv7frNMWhReuSnJtRH9QMr4pZMY1
+# build
+cargo build --release
 
-# list accounts
-$ kiltctl account list
-account-1: 4s2nEFqAhstzrtwz71WzKv7frNMWhReuSnJtRH9QMr4pZMY1
-other: 4o9mSiQ8QvadqhVXMzpekzAK18BVyeLk4UZUKJyCXZei1THE
+# copy the binary to a location in your PATH
+sudo cp target/release/kiltctl /usr/local/bin
 
-# show local data about the account
-$ kiltctl account show account-1
-{
-  "name": "account-1",
-  "algorithm": "Sr25519",
-  "seed_id": "seed-1",
-  "derive_path": "//kilt/accounts/sr25519/1",
-  "address": "4s2nEFqAhstzrtwz71WzKv7frNMWhReuSnJtRH9QMr4pZMY1"
-}
-
-# query the balance of the account
-$ kiltctl account info account-1
-address: 4s2nEFqAhstzrtwz71WzKv7frNMWhReuSnJtRH9QMr4pZMY1
-total: 20.6975 KILT
-free: 18.6975 KILT
-reserved: 2.0000 KILT
-nonce: 10
-
-# send some tokens to another account
-$ kiltctl account send --from account-1 --to other --amount 5.0
+# setup completions (for example zsh)
+kiltctl completions zsh > ~/.oh-my-zsh/completions/_kiltctl
 ```
 
-## Storage
+## Usage
 
-All application data is stored in gpg encrypted files within a git repository at `${HOME}/.kiltctl`. Therefore you need to have a gpg key generated + git installed on your system in order to use kiltctl. Because all data is encrypted and within a git repository, you can safely push your data to a remote repository and use this as a cross device synchronization mechanism. You can also use the `kiltctl` command line tool to securely store and retrieve credentials.
-
-Basically the security of all your seeds and accounts boils down to the security of your gpg key. If you lose your gpg key, you will lose all your data. 
-
-But this also comes with a benefit: Since gpg is quiet old, there is a ton of tooling around it, so for example
-
-* you can generate a [paperkey](https://wiki.archlinux.org/title/Paperkey) for your gpg key
-* you can use your [yubikey](https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP) to have a two factor authentication on your gpg key
-* there is even limited [ledger support](https://support.ledger.com/hc/en-us/articles/115005200649-OpenPGP?docs=true) for your gpg key
-
-## Recipes
-
-### Create paper wallet
-
-This will walk you through the process of creating a paperwallet. This will **not** save your seed or account infos into your local keystore.
+Simple example:
 
 ```bash
-# create a new seed and save it to a file
-kiltctl seed generate > seed.txt
-
-# create a account and save it to another file
-kiltctl account generate --seed "$(cat seed.txt)" > account.txt
-
-# create a QR code for printing
-cat seed.txt account.txt | qrencode -o paperwallet.png
-
-# print to paper and delete everything afterwards
-convert paperwallet.png paperwallet.pdf
-lp paperwallet.pdf
-rm paperwallet.* seed.txt
-
-# show account address so, you can send token to your paperwallet
-cat account.txt
+kiltctl tx balances transfer --amount 10KILT --to ${TARGET_ACCOUNT} | \
+    kiltctl tx sign --seed "${SENDER_SEED}" | \
+    kiltctl tx submit
 ```
 
-### Import your sporran account
+For more complex usage examples please refer to the shell scripts in [./examples](./examples).
 
-```bash
-# create a text file with your passphrase
-echo "this is my twelve word passphrase which is obviously different than this" > sporran-seed.txt
 
-# import the seed and save it as "sporran"
-kiltctl seed import --path sporran-seed.txt sporran
-rm sporran-seed.txt
 
-# generate the default account from that seed and save it as "sporran"
-kiltctl account generate --seed @sporran sporran
-
-# now you can use your wallet from the command line
-kiltctl account send --from sporran --to savings --amount 1000.00
-```
-
-### Sign and verify documents
-
-```bash
-# prepare your doc
-echo "foobar" >> doc.txt
-
-# create signature
-cat doc.txt | kiltctl account sign sporran > doc.sig
-
-# verify the signature
-cat doc.txt | kiltctl account verify sporran --signature "$(cat doc.sig)" && echo "success!"
-```
-
-### Import an address without seed
-
-Sometimes you might want to have some common addresses in your keystore to easily access them when sending tokens or verifying docs.
-You dont have to own the seeds to the accounts to just send them token or verify docs.
-
-```bash
-# import an account and save it as "friends/alice"
-kiltctl account import \
-    --algorithm sr25519 \
-    --address 4tPhwr6aBrn48nk5CsAWtAcoCMzT4UdtXGDbcQ8M7HDAw8Ee \
-    friends/alice
-
-# use the imported account to do stuff
-kiltctl account send --from sporran --to friends/alice --amount 1000.00
-```
-
-### Create and register a full DID
-
-This shows how you create a completely fresh full did. The only requirement is that you have a funded `payment-account` in your wallet.
-
-```bash
-# generate a new seed
-kiltctl seed generate did-seed
-
-# generate the authentication key 
-kiltctl account generate \
-    --seed @did-seed \
-    --derive '//did//0' \
-    did-auth-account
-
-# write the DID to local storage and give it a name
-kiltctl did create --auth did-auth-account example-id
-
-# register the DID to the chain paying with the payment-account
-kiltctl did register --payment payment-account example-id
-```
-
-### Import your DID from sporran
-
-You can also import your sporran DID.
-
-```bash
-# create a text file with your passphrase
-echo "this is my twelve word passphrase which is obviously different than this" > sporran-seed.txt
-
-# import the seed and save it as "sporran"
-kiltctl seed import --path sporran-seed.txt sporran-seed
-rm sporran-seed.txt
-
-# generate the wallet account
-kiltctl account generate --seed @sporran-seed sporran-payment-account
-
-# generate the authentication key 
-kiltctl account generate \
-    --seed @sporran-seed \
-    --derive '//did//0' \
-    sporran-did-auth-account
-
-# write the DID to local storage and give it a name
-kiltctl did create --auth sporran-did-auth-account sporran-id
-```
-
-### Claim a web3 name
-
-Claiming a web3 name is simple:
-
-```bash
-# claim the w3n `example` for `sporran-id` paying with `sporran-payment-account`
-kiltctl did claim-web3-name \
-    --did sporran-id \
-    --name example \
-    --payment sporran-payment-account
-```
-
-## Disclaimer
-
-This software comes as it is without any warranties. Look at the license for more infos. Although I'm employee of botlabs this here is my personal work and can not and will never be considered officially supported by the kilt team. If you want to use officially supported software to interact with the kilt blockchain consider using the [sdk](https://github.com/KILTprotocol/sdk-js). 
