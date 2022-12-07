@@ -73,11 +73,12 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let cli = connect(matches).await?;
 
     let did_doc_addr = kilt::storage().did().did(&did);
-    let did_doc = cli
+    let tx_counter = cli
         .storage()
         .fetch(&did_doc_addr, None)
         .await?
-        .ok_or("DID not found")?;
+        .map(|doc| doc.last_tx_counter +1)
+        .unwrap_or(1u64);
 
     let block_number = cli
         .rpc()
@@ -91,7 +92,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
 
     let op = DidAuthorizedCallOperation {
         did,
-        tx_counter: did_doc.last_tx_counter + 1,
+        tx_counter,
         call: kiltapi::kilt::Call::decode(&mut tx_bytes.as_ref())?,
         block_number,
         submitter,

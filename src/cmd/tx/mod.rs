@@ -8,6 +8,7 @@ mod proxy;
 mod sign;
 mod submit;
 mod util;
+mod linking;
 
 pub fn command() -> clap::Command {
     clap::Command::new("tx")
@@ -22,6 +23,7 @@ pub fn command() -> clap::Command {
             util::command(),
             attestation::command(),
             proxy::command(),
+            linking::command(),
         ])
 }
 
@@ -35,6 +37,7 @@ pub async fn run(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>>
         Some(("util", matches)) => util::run(matches).await,
         Some(("attestation", matches)) => attestation::run(matches).await,
         Some(("proxy", matches)) => proxy::run(matches).await,
+        Some(("linking", matches)) => linking::run(matches).await,
         _ => Err("no valid subcommand".into()),
     }
 }
