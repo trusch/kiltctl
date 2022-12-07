@@ -1,6 +1,6 @@
 use kiltapi::{
     connect,
-    kilt::{self, runtime_types::spiritnet_runtime::ProxyType},
+    kilt::{self, ProxyType},
     AccountIdParser,
 };
 use sp_core::crypto::AccountId32;

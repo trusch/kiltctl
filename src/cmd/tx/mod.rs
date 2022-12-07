@@ -4,11 +4,11 @@ mod attestation;
 mod balances;
 mod ctype;
 mod did;
+mod linking;
 mod proxy;
 mod sign;
 mod submit;
 mod util;
-mod linking;
 
 pub fn command() -> clap::Command {
     clap::Command::new("tx")

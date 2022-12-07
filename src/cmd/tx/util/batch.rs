@@ -1,6 +1,6 @@
 use clap::ArgAction;
 use codec::Decode;
-use kiltapi::{connect, kilt::runtime_types};
+use kiltapi::{connect, kilt::Call};
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {
@@ -31,21 +31,21 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         .map(|tx| hex::decode(tx.trim_start_matches("0x").trim()))
         .collect::<Result<Vec<Vec<u8>>, _>>()?
         .into_iter()
-        .map(|tx| runtime_types::spiritnet_runtime::Call::decode(&mut &tx[..]))
+        .map(|tx| Call::decode(&mut &tx[..]))
         .collect::<Result<Vec<_>, _>>()?;
 
     log::debug!("got {} txs from the flags", txs.len());
 
     if txs.is_empty() {
         // read lines and parse them as Calls
-        loop {    
+        loop {
             let mut buf = String::new();
             let n = std::io::stdin().read_line(&mut buf)?;
             if n == 0 {
                 break;
             }
             let tx = hex::decode(buf.trim_start_matches("0x").trim())?;
-            let tx = runtime_types::spiritnet_runtime::Call::decode(&mut &tx[..])?;
+            let tx = Call::decode(&mut &tx[..])?;
             log::debug!("found tx from stdin: {:?}", tx);
             txs.push(tx);
         }

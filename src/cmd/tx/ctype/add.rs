@@ -5,14 +5,14 @@ use crate::ctype::CType;
 
 pub fn command() -> clap::Command {
     clap::Command::new("add")
-    .about("Add a new CType to the chain")
-    .arg(
-        clap::Arg::new("ctype")
-            .short('c')
-            .long("ctype")
-            .help("CType data")
-            .env("CTYPE"),
-    )
+        .about("Add a new CType to the chain")
+        .arg(
+            clap::Arg::new("ctype")
+                .short('c')
+                .long("ctype")
+                .help("CType data")
+                .env("CTYPE"),
+        )
 }
 
 pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {

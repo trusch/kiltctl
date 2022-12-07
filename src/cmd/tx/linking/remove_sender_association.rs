@@ -1,11 +1,9 @@
-
 use kiltapi::{connect, kilt};
 
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {
-    clap::Command::new("remove-sender-association")
-        .about("Remove the link between sender and DID")
+    clap::Command::new("remove-sender-association").about("Remove the link between sender and DID")
 }
 
 pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {

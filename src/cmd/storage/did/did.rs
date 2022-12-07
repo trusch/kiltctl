@@ -2,9 +2,7 @@ use kiltapi::{connect, AccountIdParser};
 use sp_core::crypto::AccountId32;
 
 pub fn command() -> clap::Command {
-    clap::Command::new("did")
-    .about("Lookup a DID")
-    .arg(
+    clap::Command::new("did").about("Lookup a DID").arg(
         clap::Arg::new("did")
             .short('d')
             .long("did")

@@ -77,7 +77,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         .storage()
         .fetch(&did_doc_addr, None)
         .await?
-        .map(|doc| doc.last_tx_counter +1)
+        .map(|doc| doc.last_tx_counter + 1)
         .unwrap_or(1u64);
 
     let block_number = cli

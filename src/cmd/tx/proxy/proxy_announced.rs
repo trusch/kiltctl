@@ -1,7 +1,7 @@
 use codec::Decode;
 use kiltapi::{
     connect,
-    kilt::{self, runtime_types::spiritnet_runtime::ProxyType},
+    kilt::{self, ProxyType},
     AccountIdParser, CallParser, RawCall,
 };
 use sp_core::crypto::AccountId32;

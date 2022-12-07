@@ -1,6 +1,5 @@
-
-use kiltapi::{AccountIdParser, connect, kilt};
-use sp_core::{crypto::AccountId32};
+use kiltapi::{connect, kilt, AccountIdParser};
+use sp_core::crypto::AccountId32;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {
