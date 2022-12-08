@@ -3,12 +3,11 @@ use kiltapi::{
     kilt::runtime_types::{
         public_credentials::credentials::Credential, sp_runtime::bounded::bounded_vec::BoundedVec,
     },
-    unwrap_or_stdin,
 };
 use sp_core::H256;
 use subxt::tx::TxPayload;
 
-use crate::ctype::CType;
+
 
 pub fn command() -> clap::Command {
     clap::Command::new("add")

@@ -5,21 +5,11 @@ use kiltapi::{
     kilt::{
         self,
         runtime_types::{
-            kilt_asset_dids::{
-                asset::v1::{
-                    AssetId, GenericAssetId, GenericAssetIdentifier, GenericAssetNamespace,
-                    GenericAssetReference,
-                },
-                chain::v1::{
-                    ChainId, GenericChainId, GenericChainNamespace, GenericChainReference,
-                },
-            },
-            public_credentials::credentials::{Credential, CredentialEntry},
+            public_credentials::credentials::{CredentialEntry},
             runtime_common::authorization::AuthorizationId,
-            sp_runtime::bounded::bounded_vec::BoundedVec,
         },
     },
-    unwrap_or_stdin, AccountIdParser,
+    unwrap_or_stdin,
 };
 use sp_core::{
     crypto::{AccountId32, Ss58Codec},
