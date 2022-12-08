@@ -4,6 +4,7 @@ mod fetch_metadata;
 mod hash;
 mod keys;
 mod seed;
+mod asset_dids;
 
 pub fn command() -> clap::Command {
     clap::Command::new("util")
@@ -16,6 +17,7 @@ pub fn command() -> clap::Command {
             fetch_metadata::command(),
             hash::command(),
             current_block::command(),
+            asset_dids::command(),
         ])
 }
 
@@ -27,6 +29,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         Some(("fetch-metadata", matches)) => fetch_metadata::run(matches).await,
         Some(("hash", matches)) => hash::run(matches).await,
         Some(("current-block", matches)) => current_block::run(matches).await,
+        Some(("asset-dids", matches)) => asset_dids::run(matches),
         _ => unreachable!(),
     }
 }
