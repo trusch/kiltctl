@@ -1,4 +1,10 @@
-use kiltapi::{connect, unwrap_or_stdin, kilt::runtime_types::{public_credentials::credentials::Credential, sp_runtime::bounded::bounded_vec::BoundedVec}};
+use kiltapi::{
+    connect,
+    kilt::runtime_types::{
+        public_credentials::credentials::Credential, sp_runtime::bounded::bounded_vec::BoundedVec,
+    },
+    unwrap_or_stdin,
+};
 use sp_core::H256;
 use subxt::tx::TxPayload;
 
@@ -36,7 +42,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let did = matches.get_one::<String>("subject").unwrap().to_owned();
     let claims = matches.get_one::<String>("claims").unwrap().to_owned();
 
-    let tx = crate::kilt::tx().public_credentials().add(Credential{
+    let tx = crate::kilt::tx().public_credentials().add(Credential {
         ctype_hash,
         subject: BoundedVec(did.into_bytes()),
         claims: BoundedVec(claims.into()),

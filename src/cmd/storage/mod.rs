@@ -1,7 +1,7 @@
 mod ctype;
 mod did;
-mod system;
 mod public_credentials;
+mod system;
 
 pub fn command() -> clap::Command {
     clap::Command::new("storage")

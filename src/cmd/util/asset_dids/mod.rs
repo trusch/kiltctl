@@ -5,10 +5,7 @@ pub fn command() -> clap::Command {
     clap::Command::new("asset-dids")
         .about("Some helpers for working with asset-dids")
         .subcommand_required(true)
-        .subcommands([
-            generate::command(),
-            get_credential_id::command(),
-        ])
+        .subcommands([generate::command(), get_credential_id::command()])
 }
 
 pub fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {

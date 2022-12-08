@@ -71,16 +71,20 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
                 .map_err(|_| "failed to parse credential id")?,
         );
         StorageMapKey::new(id, StorageHasher::Blake2_128Concat).to_bytes(&mut query_key);
-        let attestation_data = cli.storage()
-                .fetch_raw(&query_key, None)
-                .await?
-                .ok_or("no attestation found")?;
+        let attestation_data = cli
+            .storage()
+            .fetch_raw(&query_key, None)
+            .await?
+            .ok_or("no attestation found")?;
         let attestation = Entry::decode(&mut &attestation_data[..])?;
         print_credential_entry(attestation);
     } else {
         let keys = cli.storage().fetch_keys(&query_key, 10, None, None).await?;
         for key in keys {
-            println!("Credential ID: 0x{}", hex::encode(&key.0[key.0.len()-32..]));
+            println!(
+                "Credential ID: 0x{}",
+                hex::encode(&key.0[key.0.len() - 32..])
+            );
             if let Some(storage_data) = cli.storage().fetch_raw(&key.0, None).await? {
                 let value = Entry::decode(&mut &storage_data[..])?;
                 print_credential_entry(value);

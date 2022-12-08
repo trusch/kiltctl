@@ -1,8 +1,21 @@
-use codec::Encode;
-use kiltapi::{connect, unwrap_or_stdin, kilt::{runtime_types::{public_credentials::credentials::Credential, sp_runtime::bounded::bounded_vec::BoundedVec, runtime_common::authorization::{AuthorizationId, PalletAuthorize}, delegation::access_control::DelegationAc, peregrine_runtime::Runtime}, self}, AccountIdParser};
-use sp_core::{H256, crypto::AccountId32};
-use subxt::tx::TxPayload;
 use blake2::{digest::consts::U32, Blake2b, Digest};
+use codec::Encode;
+use kiltapi::{
+    connect,
+    kilt::{
+        self,
+        runtime_types::{
+            delegation::access_control::DelegationAc,
+            peregrine_runtime::Runtime,
+            public_credentials::credentials::Credential,
+            runtime_common::authorization::{AuthorizationId, PalletAuthorize},
+            sp_runtime::bounded::bounded_vec::BoundedVec,
+        },
+    },
+    unwrap_or_stdin, AccountIdParser,
+};
+use sp_core::{crypto::AccountId32, H256};
+use subxt::tx::TxPayload;
 type Blake2b256 = Blake2b<U32>;
 
 use crate::ctype::CType;
@@ -45,9 +58,12 @@ pub fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>>
     let ctype_hash = H256::from_slice(&ctype_hash_bytes);
     let did = matches.get_one::<String>("subject").unwrap().to_owned();
     let claims = matches.get_one::<String>("claims").unwrap().to_owned();
-    let attester = matches.get_one::<AccountId32>("attester").unwrap().to_owned();
+    let attester = matches
+        .get_one::<AccountId32>("attester")
+        .unwrap()
+        .to_owned();
 
-    let cred = Credential{
+    let cred = Credential {
         ctype_hash,
         subject: BoundedVec(did.into_bytes()),
         claims: BoundedVec(claims.into()),

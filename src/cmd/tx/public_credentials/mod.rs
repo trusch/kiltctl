@@ -1,8 +1,8 @@
 mod add;
-mod revoke;
-mod remove;
-mod unrevoke;
 mod reclaim_deposit;
+mod remove;
+mod revoke;
+mod unrevoke;
 
 pub fn command() -> clap::Command {
     clap::Command::new("public-credentials")
@@ -11,7 +11,7 @@ pub fn command() -> clap::Command {
         .subcommands([
             add::command(),
             revoke::command(),
-            remove::command(),  
+            remove::command(),
             unrevoke::command(),
             reclaim_deposit::command(),
         ])

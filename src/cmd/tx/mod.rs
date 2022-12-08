@@ -6,10 +6,10 @@ mod ctype;
 mod did;
 mod linking;
 mod proxy;
+mod public_credentials;
 mod sign;
 mod submit;
 mod util;
-mod public_credentials;
 
 pub fn command() -> clap::Command {
     clap::Command::new("tx")
