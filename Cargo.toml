@@ -5,6 +5,7 @@ edition = "2021"
 
 [[bin]]
 name = "kiltctl"
+build = "build.rs"
 path = "src/cmd/main.rs"
 
 [lib]
@@ -33,3 +34,6 @@ rand = "0.8.5"
 chrono = "0.4"
 conquer-once = "0.3"
 clap_complete = "4.0.6"
+
+[build-dependencies]
+vergen = "7"
