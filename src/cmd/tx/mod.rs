@@ -10,6 +10,7 @@ mod public_credentials;
 mod sign;
 mod submit;
 mod util;
+mod w3n;
 
 pub fn command() -> clap::Command {
     clap::Command::new("tx")
@@ -26,6 +27,7 @@ pub fn command() -> clap::Command {
             proxy::command(),
             linking::command(),
             public_credentials::command(),
+            w3n::command(),
         ])
 }
 
@@ -41,6 +43,7 @@ pub async fn run(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>>
         Some(("proxy", matches)) => proxy::run(matches).await,
         Some(("linking", matches)) => linking::run(matches).await,
         Some(("public-credentials", matches)) => public_credentials::run(matches).await,
+        Some(("w3n", matches)) => w3n::run(matches).await,
         _ => Err("no valid subcommand".into()),
     }
 }
