@@ -7,13 +7,13 @@ use sp_core::{crypto::Ss58Codec, H256};
 
 pub fn command() -> clap::Command {
     clap::Command::new("ctypes")
-    .about("Access the CTypes list")
-    .arg(
-        clap::Arg::new("hash")
-            .long("hash")
-            .help("ctype hash to lookup")
-            .env("HASH"),
-    )
+        .about("Access the CTypes list")
+        .arg(
+            clap::Arg::new("hash")
+                .long("hash")
+                .help("ctype hash to lookup")
+                .env("HASH"),
+        )
 }
 
 pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {

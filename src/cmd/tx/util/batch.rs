@@ -38,7 +38,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
 
     if txs.is_empty() {
         // read lines and parse them as Calls
-        loop {    
+        loop {
             let mut buf = String::new();
             let n = std::io::stdin().read_line(&mut buf)?;
             if n == 0 {

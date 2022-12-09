@@ -4,11 +4,12 @@ mod attestation;
 mod balances;
 mod ctype;
 mod did;
+mod linking;
 mod proxy;
 mod sign;
 mod submit;
 mod util;
-mod linking;
+mod w3n;
 
 pub fn command() -> clap::Command {
     clap::Command::new("tx")
@@ -24,6 +25,7 @@ pub fn command() -> clap::Command {
             attestation::command(),
             proxy::command(),
             linking::command(),
+            w3n::command(),
         ])
 }
 
@@ -38,6 +40,7 @@ pub async fn run(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>>
         Some(("attestation", matches)) => attestation::run(matches).await,
         Some(("proxy", matches)) => proxy::run(matches).await,
         Some(("linking", matches)) => linking::run(matches).await,
+        Some(("w3n", matches)) => w3n::run(matches).await,
         _ => Err("no valid subcommand".into()),
     }
 }

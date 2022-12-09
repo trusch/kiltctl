@@ -1,9 +1,9 @@
 mod account;
+mod current_block;
 mod fetch_metadata;
 mod hash;
 mod keys;
 mod seed;
-mod current_block;
 
 pub fn command() -> clap::Command {
     clap::Command::new("util")

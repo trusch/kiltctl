@@ -1,5 +1,5 @@
 use codec::Encode;
-use kiltapi::{AccountIdParser, connect, kilt};
+use kiltapi::{connect, kilt, AccountIdParser};
 use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519, Pair};
 use subxt::tx::TxPayload;
 
