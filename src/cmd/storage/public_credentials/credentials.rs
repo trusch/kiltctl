@@ -5,7 +5,7 @@ use kiltapi::{
     kilt::{
         self,
         runtime_types::{
-            public_credentials::credentials::{CredentialEntry},
+            public_credentials::credentials::CredentialEntry,
             runtime_common::authorization::AuthorizationId,
         },
     },

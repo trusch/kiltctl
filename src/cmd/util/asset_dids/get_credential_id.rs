@@ -1,21 +1,17 @@
 use blake2::{digest::consts::U32, Blake2b, Digest};
 use codec::Encode;
 use kiltapi::{
-    kilt::{
-        runtime_types::{
-            delegation::access_control::DelegationAc,
-            peregrine_runtime::Runtime,
-            public_credentials::credentials::Credential,
-            runtime_common::authorization::{PalletAuthorize},
-            sp_runtime::bounded::bounded_vec::BoundedVec,
-        },
-    }, AccountIdParser,
+    kilt::runtime_types::{
+        delegation::access_control::DelegationAc, peregrine_runtime::Runtime,
+        public_credentials::credentials::Credential,
+        runtime_common::authorization::PalletAuthorize,
+        sp_runtime::bounded::bounded_vec::BoundedVec,
+    },
+    AccountIdParser,
 };
 use sp_core::{crypto::AccountId32, H256};
 
 type Blake2b256 = Blake2b<U32>;
-
-
 
 pub fn command() -> clap::Command {
     clap::Command::new("get-credential-id")

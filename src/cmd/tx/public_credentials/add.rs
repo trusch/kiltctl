@@ -7,8 +7,6 @@ use kiltapi::{
 use sp_core::H256;
 use subxt::tx::TxPayload;
 
-
-
 pub fn command() -> clap::Command {
     clap::Command::new("add")
         .about("Add a new public credential to the chain")
