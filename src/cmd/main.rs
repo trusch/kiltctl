@@ -3,6 +3,7 @@ mod ctype;
 mod storage;
 mod tx;
 mod util;
+mod version;
 
 use std::io::Write;
 
@@ -40,6 +41,7 @@ fn command() -> clap::Command {
                         .required(true),
                 ),
         )
+        .subcommand(version::command())
 }
 
 fn print_completions<G: Generator>(gen: G, out: &mut dyn Write) {
@@ -60,6 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(("storage", matches)) => storage::run(matches).await,
         Some(("credential", matches)) => credential::run(matches).await,
         Some(("ctype", matches)) => ctype::run(matches).await,
+        Some(("version", _)) => version::run(),
         Some(("completions", matches)) => {
             let shell = matches.get_one::<Shell>("shell").unwrap().to_owned();
             print_completions(shell, &mut std::io::stdout());
