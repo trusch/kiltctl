@@ -5,7 +5,6 @@ edition = "2021"
 
 [[bin]]
 name = "kiltctl"
-build = "build.rs"
 path = "src/cmd/main.rs"
 
 [lib]

@@ -23,6 +23,9 @@ pub fn command() -> clap::Command {
 
 pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
     let seed: &String = matches.get_one("seed").expect("need seed");
+    if seed.is_empty() {
+        return Err("empty seed".into());
+    }
     let tx = unwrap_or_stdin(matches.get_one("tx").map(|s: &String| s.to_owned()))?;
 
     let call = RawCall {
