@@ -7,6 +7,7 @@ mod did;
 mod linking;
 mod proxy;
 mod sign;
+mod staking;
 mod submit;
 mod util;
 mod w3n;
@@ -26,6 +27,7 @@ pub fn command() -> clap::Command {
             proxy::command(),
             linking::command(),
             w3n::command(),
+            staking::command(),
         ])
 }
 
@@ -41,6 +43,7 @@ pub async fn run(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>>
         Some(("proxy", matches)) => proxy::run(matches).await,
         Some(("linking", matches)) => linking::run(matches).await,
         Some(("w3n", matches)) => w3n::run(matches).await,
+        Some(("staking", matches)) => staking::run(matches).await,
         _ => Err("no valid subcommand".into()),
     }
 }
