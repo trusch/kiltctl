@@ -4,6 +4,7 @@ mod proxy;
 mod proxy_announced;
 mod reject_announcement;
 mod remove_announcement;
+mod pure;
 
 pub fn command() -> clap::Command {
     clap::Command::new("proxy")
@@ -16,6 +17,7 @@ pub fn command() -> clap::Command {
             proxy_announced::command(),
             reject_announcement::command(),
             remove_announcement::command(),
+            pure::command(),
         ])
 }
 
@@ -27,6 +29,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         Some(("proxy-announced", matches)) => proxy_announced::run(matches).await,
         Some(("reject-announcement", matches)) => reject_announcement::run(matches).await,
         Some(("remove-announcement", matches)) => remove_announcement::run(matches).await,
+        Some(("pure", matches)) => pure::run(matches).await,
         _ => unreachable!(),
     }
 }
