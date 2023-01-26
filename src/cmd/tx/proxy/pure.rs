@@ -1,6 +1,6 @@
 use kiltapi::{
     connect,
-    kilt::{self, runtime_types::spiritnet_runtime::ProxyType},
+    kilt::{self, ProxyType},
 };
 use subxt::tx::TxPayload;
 
