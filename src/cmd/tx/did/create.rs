@@ -13,8 +13,8 @@ use kiltapi::{
     AccountIdParser,
 };
 use sp_core::{sr25519, Pair};
-use subxt::utils::AccountId32;
 use subxt::tx::TxPayload;
+use subxt::utils::AccountId32;
 
 pub fn command() -> clap::Command {
     clap::Command::new("create")

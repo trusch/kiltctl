@@ -72,7 +72,7 @@ pub fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>>
         _ => panic!("unknown key type"),
     };
 
-    println!("{}", address);
+    println!("{address}");
 
     Ok(())
 }

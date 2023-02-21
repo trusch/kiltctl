@@ -39,7 +39,7 @@ impl FromStr for WaitFor {
             "submitted" => Ok(WaitFor::Submitted),
             "in-block" => Ok(WaitFor::InBlock),
             "finalized" => Ok(WaitFor::Finalized),
-            _ => Err(format!("Invalid wait-for value: {}", s)),
+            _ => Err(format!("Invalid wait-for value: {s}")),
         }
     }
 }

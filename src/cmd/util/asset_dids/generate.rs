@@ -39,14 +39,13 @@ pub fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>>
     let asset_id = matches.get_one::<String>("asset-id");
 
     let mut did = format!(
-        "did:asset:{}:{}.{}:{}",
-        chain_namespace, chain_reference, asset_namespace, asset_reference
+        "did:asset:{chain_namespace}:{chain_reference}.{asset_namespace}:{asset_reference}"
     );
     if let Some(asset_id) = asset_id {
-        did = format!("{}:{}", did, asset_id);
+        did = format!("{did}:{asset_id}");
     }
 
-    println!("{}", did);
+    println!("{did}");
 
     Ok(())
 }

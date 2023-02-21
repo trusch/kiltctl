@@ -2,9 +2,9 @@ mod add;
 mod announce;
 mod proxy;
 mod proxy_announced;
+mod pure;
 mod reject_announcement;
 mod remove_announcement;
-mod pure;
 
 pub fn command() -> clap::Command {
     clap::Command::new("proxy")

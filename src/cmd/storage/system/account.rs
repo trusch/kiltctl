@@ -21,8 +21,14 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let addr = kiltapi::kilt::storage().system().account(account);
 
     let cli = connect(matches).await?;
-    let details = cli.storage().at(None).await?.fetch(&addr).await?.expect("not found");
-    println!("{:#?}", details);
+    let details = cli
+        .storage()
+        .at(None)
+        .await?
+        .fetch(&addr)
+        .await?
+        .expect("not found");
+    println!("{details:#?}");
 
     Ok(())
 }

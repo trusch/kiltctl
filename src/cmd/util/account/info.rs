@@ -1,5 +1,5 @@
 use kiltapi::{connect, format_balance, AccountIdParser};
-use sp_core::crypto::{Ss58Codec};
+use sp_core::crypto::Ss58Codec;
 use subxt::utils::AccountId32;
 
 pub fn command() -> clap::Command {
@@ -22,7 +22,13 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
 
     let cli = connect(matches).await?;
 
-    let details = cli.storage().at(None).await?.fetch(&addr).await?.expect("not found");
+    let details = cli
+        .storage()
+        .at(None)
+        .await?
+        .fetch(&addr)
+        .await?
+        .expect("not found");
 
     println!(
         "Account ID: {}",

@@ -7,6 +7,6 @@ pub fn command() -> clap::Command {
 pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
     let cli = connect(matches).await?;
     let block = cli.blocks().at(None).await?.number().to_string();
-    println!("{}", block);
+    println!("{block}");
     Ok(())
 }

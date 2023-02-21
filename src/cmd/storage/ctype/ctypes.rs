@@ -29,7 +29,8 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     if let Some(holder) = ctype {
         println!(
             "ctype owned by: did:kilt:{}",
-            sp_core::crypto::AccountId32::from(holder.creator.0).to_ss58check_with_version(38u16.into())
+            sp_core::crypto::AccountId32::from(holder.creator.0)
+                .to_ss58check_with_version(38u16.into())
         );
     } else {
         return Err("ctype not found".into());

@@ -1,9 +1,6 @@
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
-use subxt::{
-    config::Config,
-    config::polkadot::PolkadotExtrinsicParams,
-};
+use subxt::{config::polkadot::PolkadotExtrinsicParams, config::Config};
 
 #[subxt::subxt(runtime_metadata_path = "./metadata.scale")]
 pub mod kilt {}

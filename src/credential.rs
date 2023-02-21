@@ -109,7 +109,7 @@ impl CredentialBuilder {
     pub fn with_ctype(mut self, ctype: &str) -> Self {
         self.ctype = Some(ctype.to_string());
         self.credential_status = Some(Status {
-            id: format!("kilt:ctype:{}", ctype),
+            id: format!("kilt:ctype:{ctype}"),
             type_: "JsonSchemaValidator2018".to_string(),
         });
         self
@@ -123,7 +123,7 @@ impl CredentialBuilder {
         if let Some(ctype) = &self.ctype {
             subject.insert(
                 "@context".to_string(),
-                json!({ "@vocab": format!("kilt:ctype:{}#", ctype) }),
+                json!({ "@vocab": format!("kilt:ctype:{ctype}#") }),
             );
         }
         self.credential_subject = Some(subject);
@@ -171,7 +171,7 @@ impl CredentialBuilder {
                             if key != "@context" {
                                 let mut key = key.to_owned();
                                 if !key.starts_with('@') {
-                                    key = format!("{}{}", vocab_str, key);
+                                    key = format!("{vocab_str}{key}");
                                 }
                                 new_credential_subject.insert(key, value.clone());
                             }
@@ -284,7 +284,7 @@ impl Credential {
                             if key != "@context" {
                                 let mut key = key.to_owned();
                                 if !key.starts_with('@') {
-                                    key = format!("{}{}", vocab_str, key);
+                                    key = format!("{vocab_str}{key}");
                                 }
                                 new_credential_subject.insert(key, value.clone());
                             }

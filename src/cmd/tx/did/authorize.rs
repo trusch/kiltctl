@@ -3,7 +3,8 @@ use kiltapi::{
     connect,
     kilt::{
         self,
-        runtime_types::{did::did_details::{DidAuthorizedCallOperation, DidSignature}}, RuntimeCall,
+        runtime_types::did::did_details::{DidAuthorizedCallOperation, DidSignature},
+        RuntimeCall,
     },
     AccountIdParser,
 };
@@ -87,7 +88,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         .rpc()
         .block(None)
         .await
-        .map_err(|e| format!("Failed to get block number: {}", e))?
+        .map_err(|e| format!("Failed to get block number: {e}"))?
         .ok_or("Failed to get block number")?
         .block
         .header

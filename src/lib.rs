@@ -2,8 +2,8 @@ use std::{io::Read, str::FromStr};
 
 use clap::error::ErrorKind::{Format, InvalidValue};
 use kilt::KiltConfig;
-use sp_core::{    H256};
-use subxt::{tx::TxPayload, OnlineClient, utils::AccountId32};
+use sp_core::H256;
+use subxt::{tx::TxPayload, utils::AccountId32, OnlineClient};
 
 pub mod credential;
 pub mod kilt;
@@ -148,18 +148,18 @@ pub fn format_balance(b: u128) -> String {
         let d = b / 1_000_000_000_000;
         let mut r = (b % 1_000_000_000_000).to_string();
         if r.len() < 12 {
-            r = format!("{:0>12}", r);
+            r = format!("{r:0>12}");
         }
         r = r[..4].to_string();
-        format!("{}.{} mKILT", d, r)
+        format!("{d}.{r} mKILT")
     } else {
         let d = b / 1_000_000_000_000_000;
         let mut r = (b % 1_000_000_000_000_000).to_string();
         if r.len() < 15 {
-            r = format!("{:0>15}", r);
+            r = format!("{r:0>15}");
         }
         r = r[..4].to_string();
-        format!("{}.{} KILT", d, r)
+        format!("{d}.{r} KILT")
     }
 }
 

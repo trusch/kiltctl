@@ -3,8 +3,8 @@ use kiltapi::{
     kilt::{self, ProxyType},
     AccountIdParser,
 };
-use subxt::utils::AccountId32;
 use subxt::tx::TxPayload;
+use subxt::utils::AccountId32;
 
 pub fn command() -> clap::Command {
     clap::Command::new("add")

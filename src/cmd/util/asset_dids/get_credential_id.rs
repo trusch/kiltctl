@@ -2,10 +2,9 @@ use blake2::{digest::consts::U32, Blake2b, Digest};
 use codec::Encode;
 use kiltapi::{
     kilt::runtime_types::{
-        delegation::access_control::DelegationAc, spiritnet_runtime::Runtime,
-        public_credentials::credentials::Credential,
-        runtime_common::authorization::PalletAuthorize,
-        sp_core::bounded::bounded_vec::BoundedVec,
+        delegation::access_control::DelegationAc, public_credentials::credentials::Credential,
+        runtime_common::authorization::PalletAuthorize, sp_core::bounded::bounded_vec::BoundedVec,
+        spiritnet_runtime::Runtime,
     },
     AccountIdParser,
 };

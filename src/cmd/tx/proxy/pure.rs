@@ -63,9 +63,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         _ => unreachable!(),
     };
 
-    let tx = kilt::tx()
-        .proxy()
-        .create_pure(proxy_type, delay, index);
+    let tx = kilt::tx().proxy().create_pure(proxy_type, delay, index);
 
     let cli = connect(matches).await?;
     let payload = tx.encode_call_data(&cli.metadata())?;
