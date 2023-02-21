@@ -1,6 +1,6 @@
 use kiltapi::{
     connect,
-    kilt::{self, runtime_types::sp_runtime::bounded::bounded_vec::BoundedVec},
+    kilt::{self, runtime_types::sp_core::bounded::bounded_vec::BoundedVec},
 };
 use subxt::tx::TxPayload;
 

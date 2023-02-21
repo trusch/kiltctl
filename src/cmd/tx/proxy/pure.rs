@@ -1,6 +1,6 @@
 use kiltapi::{
     connect,
-    kilt::{self, runtime_types::spiritnet_runtime::ProxyType},
+    kilt::{self, ProxyType},
 };
 use subxt::tx::TxPayload;
 
@@ -65,7 +65,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
 
     let tx = kilt::tx()
         .proxy()
-        .anonymous(proxy_type, delay, index);
+        .create_pure(proxy_type, delay, index);
 
     let cli = connect(matches).await?;
     let payload = tx.encode_call_data(&cli.metadata())?;

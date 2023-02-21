@@ -14,13 +14,11 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-subxt = "0.25.0"
-sp-keyring = "7"
+subxt = {version = "0.27.1"}
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive", "full", "bit-vec"] }
 clap = { version = "4.0.22", features = ["derive", "cargo", "env"] }
 hex = "0.4.3"
 tokio = { version = "1", features = ["full"] }
-sp-core = "7.0.0"
 clap-num = "1.0.2"
 tiny-bip39 = "1"
 pretty_env_logger = "0.4.0"
@@ -33,6 +31,10 @@ rand = "0.8.5"
 chrono = "0.4"
 conquer-once = "0.3"
 clap_complete = "4.0.6"
+kilt-asset-dids = { git = "https://github.com/KILTprotocol/kilt-node.git", version = "1.10.0-dev" }
+sp-core = { version = "16.0.0", default-features = false }
+sp-runtime = { version = "18.0.0" }
 
 [build-dependencies]
 vergen = "7"
+

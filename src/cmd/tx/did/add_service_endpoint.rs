@@ -4,7 +4,7 @@ use kiltapi::{
     kilt::{
         self,
         runtime_types::{
-            did::service_endpoints::DidEndpoint, sp_runtime::bounded::bounded_vec::BoundedVec,
+            did::service_endpoints::DidEndpoint, sp_core::bounded::bounded_vec::BoundedVec,
         },
     },
 };

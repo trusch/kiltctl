@@ -12,14 +12,14 @@ use kiltapi::kilt::{self};
 
 fn command() -> clap::Command {
     clap::Command::new("kiltctl")
-        .about("KILT Protocol command line helper")
+        .about("KILT Protocol command line helper (peregrine edition)")
         .arg(
             clap::Arg::new("endpoint")
                 .short('e')
                 .long("endpoint")
                 .global(true)
                 .help("Endpoint to connect to")
-                .default_value("wss://spiritnet.kilt.io:443")
+                .default_value("peregrine")
                 .env("KILT_ENDPOINT"),
         )
         .subcommand_required(true)

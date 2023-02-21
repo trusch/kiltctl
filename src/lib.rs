@@ -1,12 +1,9 @@
-use std::io::Read;
+use std::{io::Read, str::FromStr};
 
 use clap::error::ErrorKind::{Format, InvalidValue};
 use kilt::KiltConfig;
-use sp_core::{
-    crypto::{AccountId32, Ss58Codec},
-    H256,
-};
-use subxt::{tx::TxPayload, OnlineClient};
+use sp_core::{    H256};
+use subxt::{tx::TxPayload, OnlineClient, utils::AccountId32};
 
 pub mod credential;
 pub mod kilt;
@@ -14,7 +11,7 @@ pub mod kilt;
 pub struct AccountIdParser;
 
 impl clap::builder::TypedValueParser for AccountIdParser {
-    type Value = AccountId32;
+    type Value = subxt::utils::AccountId32;
 
     fn parse_ref(
         &self,
@@ -28,7 +25,7 @@ impl clap::builder::TypedValueParser for AccountIdParser {
             .map_err(|_| clap::Error::new(InvalidValue))?
             .trim_start_matches("did:kilt:")
             .to_owned();
-        let account = AccountId32::from_ss58check(&val).map_err(|_| clap::Error::new(Format))?;
+        let account = AccountId32::from_str(&val).map_err(|_| clap::Error::new(Format))?;
         Ok(account)
     }
 }

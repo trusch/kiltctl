@@ -7,12 +7,13 @@ use kiltapi::{
         runtime_types::{
             self,
             did::did_details::{DidCreationDetails, DidSignature, DidVerificationKey},
-            sp_runtime::bounded::bounded_btree_set::BoundedBTreeSet,
+            sp_core::bounded::bounded_btree_set::BoundedBTreeSet,
         },
     },
     AccountIdParser,
 };
-use sp_core::{crypto::AccountId32, sr25519, Pair};
+use sp_core::{sr25519, Pair};
+use subxt::utils::AccountId32;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {

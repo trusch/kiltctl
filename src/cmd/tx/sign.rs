@@ -1,6 +1,6 @@
 use kiltapi::{connect, unwrap_or_stdin, RawCall};
 use sp_core::{sr25519, Pair};
-use subxt::tx::{Era, PolkadotExtrinsicParamsBuilder};
+use subxt::{utils::AccountId32, config::{polkadot::PolkadotExtrinsicParamsBuilder, substrate::Era}};
 
 pub fn command() -> clap::Command {
     clap::Command::new("sign")
@@ -26,6 +26,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     if seed.is_empty() {
         return Err("empty seed".into());
     }
+    
     let tx = unwrap_or_stdin(matches.get_one("tx").map(|s: &String| s.to_owned()))?;
 
     let call = RawCall {

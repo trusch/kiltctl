@@ -1,7 +1,8 @@
 use codec::Encode;
 use kiltapi::{connect, kilt, AccountIdParser};
-use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519, Pair};
+use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use subxt::tx::TxPayload;
+use subxt::utils::AccountId32;
 
 pub fn command() -> clap::Command {
     clap::Command::new("associate-account")

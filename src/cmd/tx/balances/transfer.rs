@@ -1,5 +1,5 @@
 use kiltapi::{connect, AccountIdParser, BalanceParser};
-use sp_core::crypto::AccountId32;
+use subxt::utils::AccountId32;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {

@@ -6,6 +6,7 @@ mod ctype;
 mod did;
 mod linking;
 mod proxy;
+mod public_credentials;
 mod sign;
 mod staking;
 mod submit;
@@ -26,6 +27,7 @@ pub fn command() -> clap::Command {
             attestation::command(),
             proxy::command(),
             linking::command(),
+            public_credentials::command(),
             w3n::command(),
             staking::command(),
         ])
@@ -42,6 +44,7 @@ pub async fn run(matches: &ArgMatches) -> Result<(), Box<dyn std::error::Error>>
         Some(("attestation", matches)) => attestation::run(matches).await,
         Some(("proxy", matches)) => proxy::run(matches).await,
         Some(("linking", matches)) => linking::run(matches).await,
+        Some(("public-credentials", matches)) => public_credentials::run(matches).await,
         Some(("w3n", matches)) => w3n::run(matches).await,
         Some(("staking", matches)) => staking::run(matches).await,
         _ => Err("no valid subcommand".into()),

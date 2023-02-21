@@ -1,5 +1,5 @@
 use kiltapi::{
-    connect, kilt::runtime_types::sp_runtime::bounded::bounded_vec::BoundedVec, unwrap_or_stdin,
+    connect, kilt::runtime_types::sp_core::bounded::bounded_vec::BoundedVec, unwrap_or_stdin,
 };
 use subxt::tx::TxPayload;
 

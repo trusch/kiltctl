@@ -1,9 +1,9 @@
 use kiltapi::{
     connect,
-    kilt::{self, runtime_types::spiritnet_runtime::ProxyType},
+    kilt::{self, ProxyType},
     AccountIdParser,
 };
-use sp_core::crypto::AccountId32;
+use subxt::utils::AccountId32;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {

@@ -1,10 +1,10 @@
 use codec::Decode;
 use kiltapi::{
     connect,
-    kilt::{self, runtime_types::spiritnet_runtime::ProxyType},
+    kilt::{self, ProxyType},
     AccountIdParser, CallParser, RawCall,
 };
-use sp_core::crypto::AccountId32;
+use subxt::utils::AccountId32;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {
@@ -69,7 +69,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         });
 
     let call = matches.get_one::<RawCall>("call").unwrap();
-    let call = kiltapi::kilt::Call::decode(&mut call.call.as_ref())?;
+    let call = kiltapi::kilt::RuntimeCall::decode(&mut call.call.as_ref())?;
 
     let tx = kilt::tx().proxy().proxy_announced(
         delegate.to_owned().into(),

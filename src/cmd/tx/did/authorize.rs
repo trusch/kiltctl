@@ -3,12 +3,13 @@ use kiltapi::{
     connect,
     kilt::{
         self,
-        runtime_types::did::did_details::{DidAuthorizedCallOperation, DidSignature},
+        runtime_types::{did::did_details::{DidAuthorizedCallOperation, DidSignature}}, RuntimeCall,
     },
     AccountIdParser,
 };
-use sp_core::{crypto::AccountId32, ecdsa, ed25519, sr25519, Pair};
+use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use subxt::tx::TxPayload;
+use subxt::utils::AccountId32;
 
 pub fn command() -> clap::Command {
     clap::Command::new("authorize")
@@ -75,7 +76,9 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let did_doc_addr = kilt::storage().did().did(&did);
     let tx_counter = cli
         .storage()
-        .fetch(&did_doc_addr, None)
+        .at(None)
+        .await?
+        .fetch(&did_doc_addr)
         .await?
         .map(|doc| doc.last_tx_counter + 1)
         .unwrap_or(1u64);
@@ -93,7 +96,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let op = DidAuthorizedCallOperation {
         did,
         tx_counter,
-        call: kiltapi::kilt::Call::decode(&mut tx_bytes.as_ref())?,
+        call: RuntimeCall::decode(&mut tx_bytes.as_ref())?,
         block_number,
         submitter,
     };
