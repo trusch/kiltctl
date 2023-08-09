@@ -1,6 +1,6 @@
 use codec::{Decode, Encode};
 use kiltapi::connect;
-use sp_core::Bytes;
+use subxt::ext::sp_core::Bytes;
 use subxt::{ext::frame_metadata::RuntimeMetadataPrefixed, rpc::RpcParams};
 
 pub fn command() -> clap::Command {

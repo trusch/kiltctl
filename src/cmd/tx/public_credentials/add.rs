@@ -4,7 +4,7 @@ use kiltapi::{
         public_credentials::credentials::Credential, sp_core::bounded::bounded_vec::BoundedVec,
     },
 };
-use sp_core::H256;
+use subxt::ext::sp_core::H256;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {

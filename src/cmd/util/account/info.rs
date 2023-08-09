@@ -1,5 +1,6 @@
 use kiltapi::{connect, format_balance, AccountIdParser};
-use sp_core::crypto::Ss58Codec;
+use subxt::ext::sp_core;
+use subxt::ext::sp_core::crypto::Ss58Codec;
 use subxt::utils::AccountId32;
 
 pub fn command() -> clap::Command {

@@ -2,7 +2,7 @@ use kiltapi::{
     connect,
     kilt::{self},
 };
-use sp_core::H256;
+use subxt::ext::sp_core::H256;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {

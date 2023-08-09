@@ -3,7 +3,7 @@ use kiltapi::{
     kilt::{self},
     AccountIdParser, HashParser,
 };
-use sp_core::{crypto::AccountId32, H256};
+use subxt::ext::sp_core::{crypto::AccountId32, H256};
 use subxt::{tx::TxPayload, utils::MultiAddress};
 
 pub fn command() -> clap::Command {

@@ -1,5 +1,5 @@
 use kiltapi::unwrap_or_stdin;
-use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use subxt::ext::sp_core::{ecdsa, ed25519, sr25519, Pair};
 
 pub fn command() -> clap::Command {
     clap::Command::new("from-seed")

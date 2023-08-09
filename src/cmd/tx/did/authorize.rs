@@ -8,7 +8,7 @@ use kiltapi::{
     },
     AccountIdParser,
 };
-use sp_core::{ecdsa, ed25519, sr25519, Pair};
+use subxt::ext::sp_core::{ecdsa, ed25519, sr25519, Pair};
 use subxt::tx::TxPayload;
 use subxt::utils::AccountId32;
 

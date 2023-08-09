@@ -1,5 +1,5 @@
 [package]
-name = "kiltctl2"
+name = "kiltctl"
 version = "0.1.0"
 edition = "2021"
 
@@ -31,9 +31,9 @@ rand = "0.8.5"
 chrono = "0.4"
 conquer-once = "0.4"
 clap_complete = "4.0.6"
-kilt-asset-dids = { git = "https://github.com/KILTprotocol/kilt-node.git", version = "1.10.0-dev" }
-sp-core = { version = "21.0.0", default-features = false }
-sp-runtime = { version = "24.0.0" }
+kilt-asset-dids = { git = "https://github.com/KILTprotocol/kilt-node.git", version = "1.12.0-dev" }
+# sp-core = { version = "21.0.0", default-features = false }
+# sp-runtime = { version = "24.0.0", default-features = false}
 
 [build-dependencies]
 vergen = "8"

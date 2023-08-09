@@ -2,7 +2,7 @@ use std::{io::Read, str::FromStr};
 
 use clap::error::ErrorKind::{Format, InvalidValue};
 use kilt::KiltConfig;
-use sp_core::H256;
+use subxt::ext::sp_core::H256;
 use subxt::{tx::TxPayload, utils::AccountId32, OnlineClient};
 
 pub mod credential;

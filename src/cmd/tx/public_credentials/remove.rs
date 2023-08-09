@@ -1,5 +1,5 @@
 use kiltapi::{connect, unwrap_or_stdin};
-use sp_core::H256;
+use subxt::ext::sp_core::H256;
 use subxt::tx::TxPayload;
 
 pub fn command() -> clap::Command {

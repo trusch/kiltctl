@@ -1,4 +1,5 @@
-use sp_runtime::traits::{IdentifyAccount, Verify};
+use subxt::ext::{sp_core, sp_runtime};
+use subxt::ext::sp_runtime::traits::{IdentifyAccount, Verify};
 
 use subxt::{config::polkadot::PolkadotExtrinsicParams, config::Config};
 

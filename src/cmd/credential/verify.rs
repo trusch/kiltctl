@@ -1,7 +1,7 @@
 use base58::FromBase58;
 use clap::ArgAction;
 use kiltapi::{connect, credential::Credential, unwrap_or_stdin};
-use sp_core::H256;
+use subxt::ext::sp_core::H256;
 
 pub fn command() -> clap::Command {
     clap::Command::new("verify")

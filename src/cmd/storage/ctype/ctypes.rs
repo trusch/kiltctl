@@ -3,7 +3,7 @@ use kiltapi::{
     kilt::{self},
     unwrap_or_stdin,
 };
-use sp_core::{crypto::Ss58Codec, H256};
+use subxt::ext::sp_core::{crypto::Ss58Codec, H256};
 
 pub fn command() -> clap::Command {
     clap::Command::new("ctypes")
@@ -29,7 +29,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     if let Some(holder) = ctype {
         println!(
             "ctype owned by: did:kilt:{}",
-            sp_core::crypto::AccountId32::from(holder.creator.0)
+            subxt::ext::sp_core::crypto::AccountId32::from(holder.creator.0)
                 .to_ss58check_with_version(38u16.into())
         );
     } else {

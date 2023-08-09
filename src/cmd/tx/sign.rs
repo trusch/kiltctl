@@ -1,5 +1,5 @@
 use kiltapi::{connect, unwrap_or_stdin, RawCall};
-use sp_core::{sr25519, Pair};
+use subxt::ext::sp_core::{sr25519, Pair};
 use subxt::{config::{polkadot::PolkadotExtrinsicParamsBuilder, substrate::Era}, tx::PairSigner};
 
 pub fn command() -> clap::Command {

@@ -11,7 +11,7 @@ use kiltapi::{
     },
     unwrap_or_stdin,
 };
-use sp_core::{
+use subxt::ext::sp_core::{
     crypto::{AccountId32, Ss58Codec},
     H256,
 };
@@ -69,7 +69,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         print_credential_entry(attestation);
     } else {
         let addr = kilt::storage().public_credentials().credentials_root();
-        let mut query_key = addr.to_root_bytes();    
+        let query_key = addr.to_root_bytes();    
         let keys = cli
             .storage()
             .at_latest()

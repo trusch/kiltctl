@@ -1,5 +1,5 @@
 use kiltapi::unwrap_or_stdin;
-use sp_core::{
+use subxt::ext::sp_core::{
     crypto::{Ss58AddressFormat, Ss58Codec},
     ecdsa, ed25519, sr25519, Pair,
 };
