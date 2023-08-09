@@ -1,6 +1,8 @@
-use vergen::{vergen, Config};
+use std::error::Error;
+use vergen::EmitBuilder;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    vergen(Config::default())?;
+fn main() -> Result<(), Box<dyn Error>> {
+    // Emit the instructions
+    EmitBuilder::builder().emit()?;
     Ok(())
 }

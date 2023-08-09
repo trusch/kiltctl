@@ -4,7 +4,7 @@ use kiltapi::{
     AccountIdParser, HashParser,
 };
 use sp_core::{crypto::AccountId32, H256};
-use subxt::tx::TxPayload;
+use subxt::{tx::TxPayload, utils::MultiAddress};
 
 pub fn command() -> clap::Command {
     clap::Command::new("announce")
@@ -32,9 +32,10 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let real = matches.get_one::<AccountId32>("real").unwrap();
     let hash = matches.get_one::<H256>("call_hash").unwrap();
 
+    let id = MultiAddress::Address32(real.to_owned().into());
     let tx = kilt::tx()
         .proxy()
-        .announce(real.to_owned().into(), hash.to_owned());
+        .announce(id, hash.to_owned());
 
     let cli = connect(matches).await?;
 

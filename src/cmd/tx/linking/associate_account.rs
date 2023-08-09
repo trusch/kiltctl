@@ -1,4 +1,5 @@
 use codec::Encode;
+use kiltapi::kilt::runtime_types::pallet_did_lookup::associate_account_request::AssociateAccountRequest;
 use kiltapi::{connect, kilt, AccountIdParser};
 use sp_core::{ecdsa, ed25519, sr25519, Pair};
 use subxt::tx::TxPayload;
@@ -69,42 +70,42 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
             let pair = sr25519::Pair::from_string_with_seed(seed, None)
                 .expect("failed to parse seed")
                 .0;
-            kilt::tx().did_lookup().associate_account(
-                account.to_owned(),
-                expiration,
-                kiltapi::kilt::runtime_types::sp_runtime::MultiSignature::Sr25519(
-                    kiltapi::kilt::runtime_types::sp_core::sr25519::Signature(
-                        pair.sign(&(account, expiration).encode()).0,
-                    ),
+            let req = AssociateAccountRequest::Polkadot(account.to_owned(), kiltapi::kilt::runtime_types::sp_runtime::MultiSignature::Sr25519(
+                kiltapi::kilt::runtime_types::sp_core::sr25519::Signature(
+                    pair.sign(&(account, expiration).encode()).0,
                 ),
+            ));
+            kilt::tx().did_lookup().associate_account(
+                req,
+                expiration,
             )
         }
         "ed25519" => {
             let pair = ed25519::Pair::from_string_with_seed(seed, None)
                 .expect("failed to parse seed")
                 .0;
-            kilt::tx().did_lookup().associate_account(
-                account.to_owned(),
-                expiration,
-                kiltapi::kilt::runtime_types::sp_runtime::MultiSignature::Ed25519(
-                    kiltapi::kilt::runtime_types::sp_core::ed25519::Signature(
-                        pair.sign(&(account, expiration).encode()).0,
-                    ),
+            let req = AssociateAccountRequest::Polkadot(account.to_owned(), kiltapi::kilt::runtime_types::sp_runtime::MultiSignature::Ed25519(
+                kiltapi::kilt::runtime_types::sp_core::ed25519::Signature(
+                    pair.sign(&(account, expiration).encode()).0,
                 ),
+            ));
+            kilt::tx().did_lookup().associate_account(
+                req,
+                expiration,
             )
         }
         "ecdsa" => {
             let pair = ecdsa::Pair::from_string_with_seed(seed, None)
                 .expect("failed to parse seed")
                 .0;
-            kilt::tx().did_lookup().associate_account(
-                account.to_owned(),
-                expiration,
-                kiltapi::kilt::runtime_types::sp_runtime::MultiSignature::Ecdsa(
-                    kiltapi::kilt::runtime_types::sp_core::ecdsa::Signature(
-                        pair.sign(&(account, expiration).encode()).0,
-                    ),
+            let req = AssociateAccountRequest::Polkadot(account.to_owned(), kiltapi::kilt::runtime_types::sp_runtime::MultiSignature::Ecdsa(
+                kiltapi::kilt::runtime_types::sp_core::ecdsa::Signature(
+                    pair.sign(&(account, expiration).encode()).0,
                 ),
+            ));
+            kilt::tx().did_lookup().associate_account(
+                req,
+                expiration,
             )
         }
         _ => unreachable!(),

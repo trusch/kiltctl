@@ -1,6 +1,6 @@
 use kiltapi::{connect, unwrap_or_stdin, RawCall};
 use sp_core::{sr25519, Pair};
-use subxt::config::{polkadot::PolkadotExtrinsicParamsBuilder, substrate::Era};
+use subxt::{config::{polkadot::PolkadotExtrinsicParamsBuilder, substrate::Era}, tx::PairSigner};
 
 pub fn command() -> clap::Command {
     clap::Command::new("sign")
@@ -35,7 +35,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let pair = sr25519::Pair::from_string_with_seed(seed, None)
         .map_err(|_| "bad seed")?
         .0;
-    let signer = subxt::tx::PairSigner::new(pair);
+    let signer = PairSigner::new(pair);
 
     let cli = connect(matches).await?;
 

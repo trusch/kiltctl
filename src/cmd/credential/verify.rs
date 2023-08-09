@@ -61,7 +61,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         .attestations(H256(root_hash));
 
     let cli = connect(matches).await?;
-    let attestation = cli.storage().at(None).await?.fetch(&addr).await?;
+    let attestation = cli.storage().at_latest().await?.fetch(&addr).await?;
     if let Some(attestation) = attestation {
         if attestation.revoked {
             return Err("attestation is revoked".into());

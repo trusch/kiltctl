@@ -23,7 +23,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let cli = connect(matches).await?;
     let details = cli
         .storage()
-        .at(None)
+        .at_latest()
         .await?
         .fetch(&addr)
         .await?

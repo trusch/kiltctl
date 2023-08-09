@@ -88,7 +88,7 @@ async fn submit_extrinsic(
                             "{}.{}: {:#?}",
                             e.pallet_name(),
                             e.variant_name(),
-                            e.event_metadata().docs()
+                            e.event_metadata().pallet.docs()
                         );
                     }
                 });

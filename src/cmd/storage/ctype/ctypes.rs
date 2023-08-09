@@ -25,7 +25,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     ));
 
     let cli = connect(matches).await?;
-    let ctype = cli.storage().at(None).await?.fetch(&addr).await?;
+    let ctype = cli.storage().at_latest().await?.fetch(&addr).await?;
     if let Some(holder) = ctype {
         println!(
             "ctype owned by: did:kilt:{}",

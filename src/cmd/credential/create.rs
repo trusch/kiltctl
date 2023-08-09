@@ -48,7 +48,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         Some(block) => block.to_owned(),
         None => {
             let cli = connect(matches).await?;
-            cli.blocks().at(None).await.unwrap().number().to_string()
+            cli.blocks().at_latest().await.unwrap().number().to_string()
         }
     };
 

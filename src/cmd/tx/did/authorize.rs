@@ -77,7 +77,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let did_doc_addr = kilt::storage().did().did(&did);
     let tx_counter = cli
         .storage()
-        .at(None)
+        .at_latest()
         .await?
         .fetch(&did_doc_addr)
         .await?

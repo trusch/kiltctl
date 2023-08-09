@@ -15,7 +15,6 @@ use sp_core::{
     crypto::{AccountId32, Ss58Codec},
     H256,
 };
-use subxt::storage::address::{StorageHasher, StorageMapKey};
 
 type Entry = CredentialEntry<H256, AccountId32, u64, AccountId32, u128, AuthorizationId<H256>>;
 
@@ -47,9 +46,6 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
         .get_one::<String>("credential-id")
         .map(|e| e.to_owned());
 
-    let addr = kilt::storage().public_credentials().credentials_root();
-    let mut query_key = addr.to_root_bytes();
-    StorageMapKey::new(did, StorageHasher::Twox64Concat).to_bytes(&mut query_key);
 
     let cli = connect(matches).await?;
 
@@ -60,20 +56,23 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
                 .try_into()
                 .map_err(|_| "failed to parse credential id")?,
         );
-        StorageMapKey::new(id, StorageHasher::Blake2_128Concat).to_bytes(&mut query_key);
+
+        let key = subxt::storage::dynamic("PublicCredentials", "Credentials", vec![id]);
         let attestation_data = cli
             .storage()
-            .at(None)
+            .at_latest()
             .await?
-            .fetch_raw(&query_key)
+            .fetch(&key)
             .await?
             .ok_or("no attestation found")?;
-        let attestation = Entry::decode(&mut &attestation_data[..])?;
+        let attestation = Entry::decode(&mut &attestation_data.into_encoded()[..])?;
         print_credential_entry(attestation);
     } else {
+        let addr = kilt::storage().public_credentials().credentials_root();
+        let mut query_key = addr.to_root_bytes();    
         let keys = cli
             .storage()
-            .at(None)
+            .at_latest()
             .await?
             .fetch_keys(&query_key, 10, None)
             .await?;
@@ -82,7 +81,7 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
                 "Credential ID: 0x{}",
                 hex::encode(&key.0[key.0.len() - 32..])
             );
-            if let Some(storage_data) = cli.storage().at(None).await?.fetch_raw(&key.0).await? {
+            if let Some(storage_data) = cli.storage().at_latest().await?.fetch_raw(&key.0).await? {
                 let value = Entry::decode(&mut &storage_data[..])?;
                 print_credential_entry(value);
             }
