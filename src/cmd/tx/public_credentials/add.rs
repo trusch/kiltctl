@@ -38,11 +38,16 @@ pub async fn run(matches: &clap::ArgMatches) -> Result<(), Box<dyn std::error::E
     let ctype_hash = H256::from_slice(&ctype_hash_bytes);
     let did = matches.get_one::<String>("subject").unwrap().to_owned();
     let claims = matches.get_one::<String>("claims").unwrap().to_owned();
+    let claims_bytes = if claims.starts_with("0x") {
+        hex::decode(claims.trim_start_matches("0x"))?
+    } else {
+        claims.into_bytes()
+    };
 
     let tx = crate::kilt::tx().public_credentials().add(Credential {
         ctype_hash,
         subject: BoundedVec(did.into_bytes()),
-        claims: BoundedVec(claims.into()),
+        claims: BoundedVec(claims_bytes),
         authorization: None,
     });
 
