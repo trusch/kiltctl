@@ -8,7 +8,7 @@ use kiltapi::{
     },
     AccountIdParser,
 };
-use subxt::ext::sp_core::{H256};
+use subxt::ext::sp_core::H256;
 use subxt::utils::AccountId32;
 
 type Blake2b256 = Blake2b<U32>;
